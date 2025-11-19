@@ -7,7 +7,7 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Split-Path -Parent $scriptDir
 $srcDir = Join-Path $projectRoot 'src'
-$mainJava = Join-Path $srcDir 'com\beispiel\MonocraftFontInstaller.java'
+$javaSourceDir = Join-Path $srcDir 'com\beispiel'
 $buildDir = Join-Path $projectRoot 'build'
 $classDir = Join-Path $buildDir 'classes'
 $jarName = 'MonocraftFontInstaller.jar'
@@ -28,7 +28,9 @@ if (!(Test-Path $classDir)) {
 
 # 1. Compile Java code
 Write-Host 'Compiling Java source...'
-javac -d $classDir $mainJava
+# Get all Java files in the package
+$javaFiles = Get-ChildItem -Path $javaSourceDir -Filter "*.java" | ForEach-Object { $_.FullName }
+javac -d $classDir $javaFiles
 if ($LASTEXITCODE -ne 0) { Write-Error 'Java compilation failed.'; exit 1 }
 
 # Check for icon
@@ -59,13 +61,14 @@ if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 $iconPath = Join-Path $projectRoot 'app-icon.ico'
 $iconXml = if (Test-Path $iconPath) { "<icon>$iconPath</icon>" } else { "<icon></icon>" }
 
+$exeVersion = '1.3.1.0'
 $launch4jXml = @"
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>$jarPath</jar>
   <outfile>$exePath</outfile>
-  <errTitle>Minecraft Font Tool</errTitle>
+  <errTitle>Monocraft Font Tool</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
@@ -80,12 +83,12 @@ $launch4jXml = @"
     <windowTitle>Monocraft Font Tool for VS Code</windowTitle>
   </singleInstance>
   <versionInfo>
-    <fileVersion>1.3.0.0</fileVersion>
-    <txtFileVersion>1.3.0</txtFileVersion>
+    <fileVersion>$exeVersion</fileVersion>
+    <txtFileVersion>1.3.1</txtFileVersion>
     <fileDescription>Monocraft Font Configuration Tool for Visual Studio Code</fileDescription>
     <copyright>Copyright © 2025</copyright>
-    <productVersion>1.3.0.0</productVersion>
-    <txtProductVersion>1.3.0</txtProductVersion>
+    <productVersion>$exeVersion</productVersion>
+    <txtProductVersion>1.3.1</txtProductVersion>
     <productName>Monocraft Font Tool for VS Code</productName>
     <companyName></companyName>
     <internalName>MonocraftFontTool</internalName>

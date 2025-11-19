@@ -1,53 +1,51 @@
 # Monocraft Font Tool for VS Code
 
-A simple Windows GUI tool to install Monocraft fonts and configure Visual Studio Code font settings with one click.
+A simple, user-friendly Windows GUI tool to install Monocraft fonts and configure Visual Studio Code font settings with one click.
 
 ## Features
 
-- ✅ **Add/Remove Monocraft Font**: Toggle Monocraft font in VS Code settings with one button
-- 🎨 **Install/Uninstall Fonts**: Install Monocraft fonts for the current user (no admin rights required)
-- 📦 **Bundled Fonts**: Fonts can be embedded in the executable for single-file distribution
-- 🎯 **User-Level Installation**: No UAC prompts or administrator privileges needed
-- 🔄 **Smart Settings Management**: Preserves your existing VS Code settings structure
+- **Add/Remove Monocraft Font**: Instantly toggle Monocraft font in VS Code settings
+- **Install/Uninstall Fonts**: Install Monocraft fonts for the current user (no admin rights required)
+- **Bundled Fonts**: Fonts are embedded for single-file distribution
+- **User-Level Installation**: No UAC prompts or administrator privileges needed
+- **Smart Settings Management**: Preserves your existing VS Code settings structure
+- **Modern, Maintainable Codebase**: Modular Java code with clear separation of concerns
 
-## What It Does
+## How It Works
 
-### Add Monocraft Font Button
-Sets these VS Code settings:
-```json
-{
-  "editor.fontFamily": "Monocraft, 'Monocraft Nerd Font', Consolas, 'Courier New', monospace",
-  "editor.fontLigatures": true,
-  "terminal.integrated.fontFamily": "Monocraft Nerd Font"
-}
-```
+### Main Actions
 
-### Install Fonts Button
-- Copies font files to: `%LOCALAPPDATA%\Microsoft\Windows\Fonts`
-- Registers fonts in user registry: `HKCU\Software\Microsoft\Windows NT\CurrentVersion\Fonts`
-- No admin rights required
-- Fonts available immediately (may need to restart VS Code)
+- **Install Fonts**: Copies Monocraft font files to `%LOCALAPPDATA%\Microsoft\Windows\Fonts` and registers them for the current user (no admin required). Fonts are available immediately (restart VS Code if needed).
+- **Uninstall Fonts**: Removes Monocraft fonts from your user fonts folder and registry.
+- **Add Monocraft Font**: Updates your VS Code `settings.json` to use Monocraft fonts:
+  ```json
+  {
+    "editor.fontFamily": "Monocraft, 'Monocraft Nerd Font', Consolas, 'Courier New', monospace",
+    "terminal.integrated.fontFamily": "Monocraft Nerd Font"
+  }
+  ```
+- **Remove Monocraft Font**: Restores your previous VS Code font settings.
 
 ## Quick Start
 
 ### For Users
 
-1. **Download** the executable: `Monocraft Font Tool for VSC.exe`
+1. **Download** the latest executable: `Monocraft Font Tool for VSC.exe`
 2. **Run** the application (no installation needed)
-3. Click **"Install Fonts"** to install the Monocraft fonts
-4. Click **"Add Monocraft Font"** to configure VS Code
+3. Click **Install Fonts** to install the Monocraft fonts
+4. Click **Add Monocraft Font** to configure VS Code
 5. Restart VS Code to see the changes
 
 ### For Developers
 
 #### Build from Source
 
-Requirements:
+**Requirements:**
 - Windows 10/11
 - JDK 11 or higher
 - [Launch4j](https://launch4j.sourceforge.net/) installed at `C:\Program Files (x86)\Launch4j\`
 
-Build steps:
+**Build steps:**
 ```powershell
 # Clone or download this repository
 cd vsc-mc-script
@@ -58,34 +56,55 @@ cd vsc-mc-script
 # Build the executable
 .\scripts\rebuild.ps1
 ```
-
 The output will be: `Monocraft Font Tool for VSC.exe`
 
-## Project Structure
+## Code Structure
 
 ```
 vsc-mc-script/
-├── src/                                # Source code
+├── src/
 │   └── com/beispiel/
-│       └── MonocraftFontInstaller.java
-├── scripts/                            # Build scripts
-│   ├── build.ps1                       # Main build script
-│   ├── clean.ps1                       # Clean artifacts
-│   ├── rebuild.ps1                     # Clean + Build
-│   └── create-icon.ps1                 # Generate app icon
-├── resources/                          # Resources to bundle
+│       ├── MonocraftFontInstaller.java   # Entry point (main class)
+│       ├── MainWindow.java               # GUI components and event handlers
+│       ├── FontInstaller.java            # Font installation/uninstallation logic
+│       ├── SettingsManager.java          # VS Code settings.json manipulation
+│       ├── FileUtils.java                # File copy utility
+│       └── SystemUtils.java              # System command execution
+├── scripts/
+│   ├── build.ps1                         # Main build script
+│   ├── clean.ps1                         # Clean artifacts
+│   ├── rebuild.ps1                       # Clean + Build
+│   └── create-icon.ps1                   # Generate app icon
+├── resources/
 │   └── fonts/
-│       └── Monocraft-font/             # Font files
+│       └── Monocraft-font/
 │           ├── Monocraft-nerd-fonts-patched.ttc
-│           └── Monocraft-ttf-otf/other-formats/Monocraft.ttf
-├── build/                              # Build artifacts (gitignored)
-│   ├── classes/                        # Compiled .class files
+│           └── Monocraft.ttf
+├── build/
+│   ├── classes/
 │   │   └── com/beispiel/
-│   │       └── MonocraftFontInstaller.class
-│   ├── MonocraftFontInstaller.jar      # Compiled JAR
-│   ├── manifest.txt                    # JAR manifest
-│   ├── launch4j-config.xml             # Launch4j config
-│   └── launch4j.log                    # Build log
+│   │       ├── MonocraftFontInstaller.class
+│   │       ├── MainWindow.class
+│   │       ├── FontInstaller.class
+│   │       ├── SettingsManager.class
+│   │       ├── FileUtils.class
+│   │       └── SystemUtils.class
+│   ├── MonocraftFontInstaller.jar
+│   ├── manifest.txt
+│   ├── launch4j-config.xml
+│   └── launch4j.log
+└── docs/                                 # Documentation
+```
+
+## Documentation
+
+See the [`docs/`](./docs/) folder for detailed documentation, usage tips, and troubleshooting.
+
+---
+
+**Version:** 1.3.1
+
+**License:** MIT
 ├── docs/                               # Documentation
 │   └── SIGNING.md                      # Code signing guide
 ├── app-icon.ico                        # Application icon
