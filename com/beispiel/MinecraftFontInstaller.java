@@ -21,7 +21,7 @@ public class MinecraftFontInstaller {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Minecraft Font Tool");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(550, 220);
+        frame.setSize(600, 280);
         frame.setLayout(new BorderLayout());
         frame.getContentPane().setBackground(new Color(34, 40, 49));
 
@@ -32,43 +32,89 @@ public class MinecraftFontInstaller {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
         frame.add(titleLabel, BorderLayout.NORTH);
 
-        // Button panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setBackground(new Color(34, 40, 49));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        // Main panel with vertical layout
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(new Color(34, 40, 49));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 20, 30));
 
-        JButton addButton = new JButton("Add Minecraft Font");
-        JButton removeButton = new JButton("Remove Minecraft Font");
+        // Font installation panel (top)
+        JPanel fontPanel = new JPanel();
+        fontPanel.setLayout(new BoxLayout(fontPanel, BoxLayout.X_AXIS));
+        fontPanel.setBackground(new Color(34, 40, 49));
+        fontPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JButton installButton = new JButton("Install Fonts");
         JButton uninstallButton = new JButton("Uninstall Fonts");
 
-        Font buttonFont = new Font("Segoe UI", Font.PLAIN, 18);
+        // Settings panel (bottom)
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.X_AXIS));
+        settingsPanel.setBackground(new Color(34, 40, 49));
+        settingsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton addButton = new JButton("Add Minecraft Font");
+        JButton removeButton = new JButton("Remove Minecraft Font");
+
+        // Style all buttons consistently
+        Font buttonFont = new Font("Segoe UI", Font.PLAIN, 16);
+        
+        // Install/Uninstall buttons - blue/orange theme
+        installButton.setFont(buttonFont);
+        installButton.setBackground(new Color(72, 149, 239));
+        installButton.setForeground(Color.WHITE);
+        installButton.setFocusPainted(false);
+        installButton.setPreferredSize(new Dimension(200, 50));
+        installButton.setMaximumSize(new Dimension(200, 50));
+
+        uninstallButton.setFont(buttonFont);
+        uninstallButton.setBackground(new Color(255, 159, 64));
+        uninstallButton.setForeground(Color.WHITE);
+        uninstallButton.setFocusPainted(false);
+        uninstallButton.setPreferredSize(new Dimension(200, 50));
+        uninstallButton.setMaximumSize(new Dimension(200, 50));
+
+        // Add/Remove buttons - green/red theme
         addButton.setFont(buttonFont);
-        removeButton.setFont(buttonFont);
         addButton.setBackground(new Color(57, 255, 20));
         addButton.setForeground(Color.BLACK);
+        addButton.setFocusPainted(false);
+        addButton.setPreferredSize(new Dimension(200, 50));
+        addButton.setMaximumSize(new Dimension(200, 50));
+
+        removeButton.setFont(buttonFont);
         removeButton.setBackground(new Color(255, 71, 87));
         removeButton.setForeground(Color.WHITE);
-        addButton.setFocusPainted(false);
         removeButton.setFocusPainted(false);
-        addButton.setPreferredSize(new Dimension(180, 50));
-        removeButton.setPreferredSize(new Dimension(180, 50));
+        removeButton.setPreferredSize(new Dimension(200, 50));
+        removeButton.setMaximumSize(new Dimension(200, 50));
 
+        // Add action listeners
+        installButton.addActionListener(e -> showProgressDialog(() -> installFonts()));
+        uninstallButton.addActionListener(e -> showProgressDialog(() -> uninstallFonts()));
         addButton.addActionListener(e -> modifySettings(true));
         removeButton.addActionListener(e -> modifySettings(false));
-    installButton.addActionListener(e -> showProgressDialog(() -> installFonts()));
-    uninstallButton.addActionListener(e -> showProgressDialog(() -> uninstallFonts()));
 
-    panel.add(addButton);
-    panel.add(Box.createRigidArea(new Dimension(20, 0)));
-    panel.add(removeButton);
-    panel.add(Box.createRigidArea(new Dimension(20, 0)));
-    panel.add(installButton);
-    panel.add(Box.createRigidArea(new Dimension(10, 0)));
-    panel.add(uninstallButton);
+        // Assemble font panel
+        fontPanel.add(Box.createHorizontalGlue());
+        fontPanel.add(installButton);
+        fontPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        fontPanel.add(uninstallButton);
+        fontPanel.add(Box.createHorizontalGlue());
 
-        frame.add(panel, BorderLayout.CENTER);
+        // Assemble settings panel
+        settingsPanel.add(Box.createHorizontalGlue());
+        settingsPanel.add(addButton);
+        settingsPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        settingsPanel.add(removeButton);
+        settingsPanel.add(Box.createHorizontalGlue());
+
+        // Add panels to main panel
+        mainPanel.add(fontPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(settingsPanel);
+
+        frame.add(mainPanel, BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -208,6 +254,18 @@ public class MinecraftFontInstaller {
     // Installs the Monocraft fonts for the current user (no admin required)
     private static void installFonts() {
         try {
+            // First check if fonts are already installed correctly
+            if (verifyInstallation()) {
+                int choice = JOptionPane.showConfirmDialog(null, 
+                    "Fonts are already installed correctly.\nDo you want to reinstall them?", 
+                    "Already Installed", 
+                    JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.INFORMATION_MESSAGE);
+                if (choice != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
             // Prefer bundled resources if available; otherwise fall back to Monocraft-font folder next to executable
             List<Path> extracted = extractBundledFonts();
             Path ttc = null, ttf = null;
@@ -252,12 +310,12 @@ public class MinecraftFontInstaller {
             // Verify
             boolean ok = verifyInstallation();
             if (ok) {
-                JOptionPane.showMessageDialog(null, "Fonts installed for the current user. Restart VS Code or sign out/in if needed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Fonts installed successfully for the current user.\n\nRestart VS Code to use the fonts.", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(null, "Fonts copied but verification failed. You may need to sign out/in.", "Partial Success", JOptionPane.WARNING_MESSAGE);
             }
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Error installing fonts: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error installing fonts:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -287,15 +345,35 @@ public class MinecraftFontInstaller {
         List<Path> results = new ArrayList<>();
         // Try to read resources from classpath
         // The fonts would be bundled at root: /Monocraft-font/...
-        String[] candidates = new String[]{"/Monocraft-font/Monocraft-nerd-fonts-patched.ttc", "/Monocraft-font/Monocraft-ttf-otf/other-formats/Monocraft.ttf"};
-        Path tmp = Files.createTempDirectory("monocraft-fonts");
+        String[] candidates = new String[]{
+            "/Monocraft-font/Monocraft-nerd-fonts-patched.ttc", 
+            "/Monocraft-font/Monocraft-ttf-otf/other-formats/Monocraft.ttf"
+        };
+        
+        // Use system temp dir instead of creating our own
+        Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"), "monocraft-fonts-" + System.currentTimeMillis());
+        if (!Files.exists(tmpDir)) {
+            Files.createDirectories(tmpDir);
+        }
+        
         for (String c : candidates) {
-            try (java.io.InputStream is = MinecraftFontInstaller.class.getResourceAsStream(c)) {
+            java.io.InputStream is = null;
+            try {
+                is = MinecraftFontInstaller.class.getResourceAsStream(c);
                 if (is == null) continue;
-                Path out = tmp.resolve(Paths.get(c).getFileName().toString());
+                
+                Path out = tmpDir.resolve(Paths.get(c).getFileName().toString());
                 Files.copy(is, out, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 results.add(out);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // If extraction fails, continue with next candidate
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ignored) {}
+                }
+            }
         }
         return results;
     }
@@ -328,7 +406,24 @@ public class MinecraftFontInstaller {
     }
 
     private static void copyFile(Path src, Path dest) throws IOException {
-        // Overwrite if exists
+        // Try to delete the destination first if it exists and is in use
+        if (Files.exists(dest)) {
+            try {
+                Files.delete(dest);
+            } catch (IOException e) {
+                // If delete fails, try to wait a moment and retry
+                try {
+                    Thread.sleep(100);
+                    Files.delete(dest);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                } catch (IOException e2) {
+                    throw new IOException("Cannot overwrite " + dest.getFileName() + 
+                        " - the file may be in use. Please close any applications using this font and try again.", e2);
+                }
+            }
+        }
+        // Now copy with replace option
         Files.copy(src, dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
     }
 
