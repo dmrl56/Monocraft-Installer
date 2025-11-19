@@ -9,12 +9,15 @@ import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MinecraftFontInstaller {
     private static final String FONT_FAMILY = "Monocraft, 'Monocraft Nerd Font', Consolas, 'Courier New', monospace";
     private static final String TERMINAL_FONT = "Monocraft Nerd Font";
 
     public static void main(String[] args) {
+        // Set locale to English to ensure button labels are in English
+        Locale.setDefault(Locale.ENGLISH);
         SwingUtilities.invokeLater(() -> createAndShowGUI());
     }
 
@@ -90,8 +93,8 @@ public class MinecraftFontInstaller {
         removeButton.setMaximumSize(new Dimension(200, 50));
 
         // Add action listeners
-        installButton.addActionListener(e -> showProgressDialog(() -> installFonts()));
-        uninstallButton.addActionListener(e -> showProgressDialog(() -> uninstallFonts()));
+        installButton.addActionListener(e -> showInstallMenu(installButton));
+        uninstallButton.addActionListener(e -> uninstallFontsWithWarning());
         addButton.addActionListener(e -> modifySettings(true));
         removeButton.addActionListener(e -> modifySettings(false));
 
@@ -119,13 +122,56 @@ public class MinecraftFontInstaller {
         frame.setVisible(true);
     }
 
+    private static void showInstallMenu(JButton installButton) {
+        JPopupMenu menu = new JPopupMenu();
+        
+        JMenuItem installOnlyItem = new JMenuItem("Install Fonts Only");
+        installOnlyItem.addActionListener(e -> showProgressDialog(() -> installFonts(false)));
+        
+        JMenuItem installAndAddItem = new JMenuItem("Install Fonts & Add to VS Code");
+        installAndAddItem.addActionListener(e -> showProgressDialog(() -> installFonts(true)));
+        
+        menu.add(installOnlyItem);
+        menu.add(installAndAddItem);
+        
+        // Show menu below the button
+        menu.show(installButton, 0, installButton.getHeight());
+    }
+
+    private static void uninstallFontsWithWarning() {
+        int choice = JOptionPane.showConfirmDialog(null, 
+            "Please close Visual Studio Code before uninstalling fonts.\n\n" +
+            "This will:\n" +
+            "1. Remove Minecraft font settings from VS Code\n" +
+            "2. Uninstall font files from Windows\n\n" +
+            "Have you closed VS Code?", 
+            "Close VS Code First", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (choice == JOptionPane.YES_OPTION) {
+            showProgressDialog(() -> {
+                // First remove from VS Code settings silently
+                modifySettings(false, false);
+                // Then uninstall fonts
+                uninstallFonts();
+            });
+        }
+    }
+
     private static void modifySettings(boolean add) {
+        modifySettings(add, true);
+    }
+
+    private static void modifySettings(boolean add, boolean showMessage) {
         try {
             String userHome = System.getProperty("user.home");
             Path settingsPath = Paths.get(userHome, "AppData", "Roaming", "Code", "User", "settings.json");
 
             if (!Files.exists(settingsPath)) {
-                JOptionPane.showMessageDialog(null, "VS Code settings.json not found at:\n" + settingsPath, "Error", JOptionPane.ERROR_MESSAGE);
+                if (showMessage) {
+                    JOptionPane.showMessageDialog(null, "VS Code settings.json not found at:\n" + settingsPath, "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 return;
             }
 
@@ -148,7 +194,9 @@ public class MinecraftFontInstaller {
             Files.writeString(settingsPath, content, StandardCharsets.UTF_8);
 
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Error modifying settings: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            if (showMessage) {
+                JOptionPane.showMessageDialog(null, "Error modifying settings: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -252,7 +300,7 @@ public class MinecraftFontInstaller {
     }
 
     // Installs the Monocraft fonts for the current user (no admin required)
-    private static void installFonts() {
+    private static void installFonts(boolean alsoAddToVSCode) {
         try {
             // First check if fonts are already installed correctly
             if (verifyInstallation()) {
@@ -310,7 +358,13 @@ public class MinecraftFontInstaller {
             // Verify
             boolean ok = verifyInstallation();
             if (ok) {
-                JOptionPane.showMessageDialog(null, "Fonts installed successfully for the current user.\n\nRestart VS Code to use the fonts.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (alsoAddToVSCode) {
+                    // Also add to VS Code settings
+                    modifySettings(true, false);
+                    JOptionPane.showMessageDialog(null, "Fonts installed and added to VS Code successfully!\n\nRestart VS Code to use the Minecraft font.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Fonts installed successfully for the current user.\n\nUse 'Add Minecraft Font' button to configure VS Code.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
             } else {
                 JOptionPane.showMessageDialog(null, "Fonts copied but verification failed. You may need to sign out/in.", "Partial Success", JOptionPane.WARNING_MESSAGE);
             }
