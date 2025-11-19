@@ -94,7 +94,7 @@ public class FontInstaller {
             if (alsoAddToVSCode) {
                 SettingsManager.modifySettings(true, false);
                 JOptionPane.showMessageDialog(null, 
-                    "Fonts installed and added to VS Code successfully!\n\nRestart VS Code to use the Monocraft font.", 
+                    "Fonts installed and added to VS Code successfully!", 
                     "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(null, 

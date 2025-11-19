@@ -56,8 +56,8 @@ public class MainWindow {
         fontPanel.setBackground(new Color(34, 40, 49));
         fontPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton installButton = new JButton("Install Fonts");
-        JButton uninstallButton = new JButton("Uninstall Fonts");
+        JButton installButton = new JButton("Install Font");
+        JButton uninstallButton = new JButton("Uninstall Font");
 
         // Style buttons
         Font buttonFont = new Font("Segoe UI", Font.PLAIN, 16);
