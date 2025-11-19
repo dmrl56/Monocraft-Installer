@@ -40,6 +40,8 @@ public class MinecraftFontInstaller {
 
         JButton addButton = new JButton("Add Minecraft Font");
         JButton removeButton = new JButton("Remove Minecraft Font");
+        JButton installButton = new JButton("Install Fonts");
+        JButton uninstallButton = new JButton("Uninstall Fonts");
 
         Font buttonFont = new Font("Segoe UI", Font.PLAIN, 18);
         addButton.setFont(buttonFont);
@@ -55,10 +57,16 @@ public class MinecraftFontInstaller {
 
         addButton.addActionListener(e -> modifySettings(true));
         removeButton.addActionListener(e -> modifySettings(false));
+    installButton.addActionListener(e -> showProgressDialog(() -> installFonts()));
+    uninstallButton.addActionListener(e -> showProgressDialog(() -> uninstallFonts()));
 
-        panel.add(addButton);
-        panel.add(Box.createRigidArea(new Dimension(30, 0)));
-        panel.add(removeButton);
+    panel.add(addButton);
+    panel.add(Box.createRigidArea(new Dimension(20, 0)));
+    panel.add(removeButton);
+    panel.add(Box.createRigidArea(new Dimension(20, 0)));
+    panel.add(installButton);
+    panel.add(Box.createRigidArea(new Dimension(10, 0)));
+    panel.add(uninstallButton);
 
         frame.add(panel, BorderLayout.CENTER);
         frame.setLocationRelativeTo(null);
@@ -195,6 +203,149 @@ public class MinecraftFontInstaller {
         }
 
         return String.join("\n", lines);
+    }
+
+    // Installs the Monocraft fonts for the current user (no admin required)
+    private static void installFonts() {
+        try {
+            // Prefer bundled resources if available; otherwise fall back to Monocraft-font folder next to executable
+            List<Path> extracted = extractBundledFonts();
+            Path ttc = null, ttf = null;
+            for (Path p : extracted) {
+                String n = p.getFileName().toString().toLowerCase();
+                if (n.endsWith(".ttc")) ttc = p;
+                if (n.endsWith(".ttf")) ttf = p;
+            }
+
+            if (ttc == null || ttf == null) {
+                // fallback to external folder
+                String projectDir = Paths.get("").toAbsolutePath().toString();
+                Path srcDir = Paths.get(projectDir, "Monocraft-font");
+                Path altTtc = srcDir.resolve("Monocraft-nerd-fonts-patched.ttc");
+                Path altTtf = srcDir.resolve("Monocraft-ttf-otf").resolve("other-formats").resolve("Monocraft.ttf");
+                if (Files.exists(altTtc)) ttc = altTtc;
+                if (Files.exists(altTtf)) ttf = altTtf;
+            }
+
+            if ((ttc == null || !Files.exists(ttc)) && (ttf == null || !Files.exists(ttf))) {
+                JOptionPane.showMessageDialog(null, "Font files not found. Include Monocraft-font folder next to the app or bundle fonts into the jar.", "Fonts not found", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String localAppData = System.getenv("LOCALAPPDATA");
+            if (localAppData == null || localAppData.isEmpty()) localAppData = System.getProperty("user.home") + "\\AppData\\Local";
+            Path fontsDest = Paths.get(localAppData, "Microsoft", "Windows", "Fonts");
+            if (!Files.exists(fontsDest)) Files.createDirectories(fontsDest);
+
+            if (ttc != null && Files.exists(ttc)) {
+                Path destTtc = fontsDest.resolve(ttc.getFileName());
+                copyFile(ttc, destTtc);
+                runCommand(new String[]{"reg", "add", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", "/v", "Monocraft Nerd Font (TrueType)", "/t", "REG_SZ", "/d", destTtc.getFileName().toString(), "/f"}, true);
+            }
+
+            if (ttf != null && Files.exists(ttf)) {
+                Path destTtf = fontsDest.resolve(ttf.getFileName());
+                copyFile(ttf, destTtf);
+                runCommand(new String[]{"reg", "add", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", "/v", "Monocraft", "/t", "REG_SZ", "/d", destTtf.getFileName().toString(), "/f"}, true);
+            }
+
+            // Verify
+            boolean ok = verifyInstallation();
+            if (ok) {
+                JOptionPane.showMessageDialog(null, "Fonts installed for the current user. Restart VS Code or sign out/in if needed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Fonts copied but verification failed. You may need to sign out/in.", "Partial Success", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error installing fonts: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void uninstallFonts() {
+        try {
+            String localAppData = System.getenv("LOCALAPPDATA");
+            if (localAppData == null || localAppData.isEmpty()) localAppData = System.getProperty("user.home") + "\\AppData\\Local";
+            Path fontsDest = Paths.get(localAppData, "Microsoft", "Windows", "Fonts");
+
+            // Delete known files
+            Path ttc = fontsDest.resolve("Monocraft-nerd-fonts-patched.ttc");
+            Path ttf = fontsDest.resolve("Monocraft.ttf");
+            if (Files.exists(ttc)) Files.delete(ttc);
+            if (Files.exists(ttf)) Files.delete(ttf);
+
+            // Remove registry entries
+            runCommand(new String[]{"reg", "delete", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", "/v", "Monocraft Nerd Font (TrueType)", "/f"}, true);
+            runCommand(new String[]{"reg", "delete", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", "/v", "Monocraft", "/f"}, true);
+
+            JOptionPane.showMessageDialog(null, "Fonts uninstalled for the current user.", "Uninstalled", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error uninstalling fonts: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static List<Path> extractBundledFonts() throws IOException {
+        List<Path> results = new ArrayList<>();
+        // Try to read resources from classpath
+        // The fonts would be bundled at root: /Monocraft-font/...
+        String[] candidates = new String[]{"/Monocraft-font/Monocraft-nerd-fonts-patched.ttc", "/Monocraft-font/Monocraft-ttf-otf/other-formats/Monocraft.ttf"};
+        Path tmp = Files.createTempDirectory("monocraft-fonts");
+        for (String c : candidates) {
+            try (java.io.InputStream is = MinecraftFontInstaller.class.getResourceAsStream(c)) {
+                if (is == null) continue;
+                Path out = tmp.resolve(Paths.get(c).getFileName().toString());
+                Files.copy(is, out, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                results.add(out);
+            } catch (Exception ignored) {}
+        }
+        return results;
+    }
+
+    private static boolean verifyInstallation() throws IOException {
+        String localAppData = System.getenv("LOCALAPPDATA");
+        if (localAppData == null || localAppData.isEmpty()) localAppData = System.getProperty("user.home") + "\\AppData\\Local";
+        Path fontsDest = Paths.get(localAppData, "Microsoft", "Windows", "Fonts");
+        boolean a = Files.exists(fontsDest.resolve("Monocraft-nerd-fonts-patched.ttc"));
+        boolean b = Files.exists(fontsDest.resolve("Monocraft.ttf"));
+        return a || b;
+    }
+
+    private static void showProgressDialog(Runnable action) {
+        final JDialog dialog = new JDialog((Frame) null, "Working...", true);
+        JLabel label = new JLabel("Please wait...", SwingConstants.CENTER);
+        dialog.getContentPane().add(label);
+        dialog.setSize(300, 100);
+        dialog.setLocationRelativeTo(null);
+
+        Thread t = new Thread(() -> {
+            try {
+                action.run();
+            } finally {
+                SwingUtilities.invokeLater(dialog::dispose);
+            }
+        });
+        t.start();
+        dialog.setVisible(true);
+    }
+
+    private static void copyFile(Path src, Path dest) throws IOException {
+        // Overwrite if exists
+        Files.copy(src, dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private static void runCommand(String[] cmd, boolean wait) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        if (wait) {
+            try (java.io.InputStream is = p.getInputStream()) {
+                is.transferTo(System.out);
+            } catch (IOException ignored) {}
+            try {
+                p.waitFor();
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
 

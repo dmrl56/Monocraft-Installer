@@ -58,4 +58,11 @@ if (Test-Path $manifestFile) {
     Write-Host 'Deleted manifest.txt'
 }
 
+# Optional: uncomment to also delete generated icon
+# $iconFile = Join-Path $projectRoot 'app-icon.ico'
+# if (Test-Path $iconFile) {
+#     Remove-Item $iconFile -Force
+#     Write-Host 'Deleted app-icon.ico'
+# }
+
 Write-Host 'Clean complete!'

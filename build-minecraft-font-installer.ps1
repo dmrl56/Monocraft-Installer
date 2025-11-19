@@ -20,59 +20,81 @@ Write-Host 'Compiling Java source...'
 javac $mainJava
 if ($LASTEXITCODE -ne 0) { Write-Error 'Java compilation failed.'; exit 1 }
 
+# Check for icon
+$iconPath = Join-Path $projectRoot 'app-icon.ico'
+if (Test-Path $iconPath) {
+    Write-Host 'Found icon file: app-icon.ico' -ForegroundColor Green
+} else {
+    Write-Host 'No icon found. Run .\create-icon.ps1 to create one.' -ForegroundColor Yellow
+}
+
 # 2. Create JAR file with manifest
 Write-Host 'Creating JAR file...'
 if (!(Test-Path $manifest)) {
     # Create a default manifest if not present
     Set-Content -Path $manifest -Value "Main-Class: com.beispiel.MinecraftFontInstaller`r`n"
 }
-jar cfm $jarName $manifest -C $classDir com
+# If Monocraft-font exists, include it in the jar so fonts are bundled
+if (Test-Path (Join-Path $projectRoot 'Monocraft-font')) {
+  Write-Host 'Including Monocraft-font folder in JAR'
+  jar cfm $jarName $manifest -C $classDir com -C $projectRoot Monocraft-font
+} else {
+  jar cfm $jarName $manifest -C $classDir com
+}
 if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 
-# 3. Create Launch4j config if not present
-if (!(Test-Path $launch4jConfig)) {
-    $launch4jXml = @"
+# 3. Create Launch4j config (always regenerate to ensure latest settings)
+$iconPath = Join-Path $projectRoot 'app-icon.ico'
+$iconXml = if (Test-Path $iconPath) { "<icon>$iconPath</icon>" } else { "<icon></icon>" }
+
+$launch4jXml = @"
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>$jarPath</jar>
   <outfile>$exePath</outfile>
-  <errTitle>VS Code Font Tool</errTitle>
-  <jarArgs></jarArgs>
+  <errTitle>Minecraft Font Tool</errTitle>
+  <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>https://adoptium.net/</downloadUrl>
-  <supportUrl></supportUrl>
+  <supportUrl>https://github.com/</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
-  <icon></icon>
+  $iconXml
+  <manifest></manifest>
   <singleInstance>
-    <mutexName>VSCodeFontTool</mutexName>
-    <windowTitle></windowTitle>
+    <mutexName>MinecraftFontToolVSC_SingleInstance</mutexName>
+    <windowTitle>Minecraft Font Tool for VS Code</windowTitle>
   </singleInstance>
   <versionInfo>
-    <fileVersion>1.0.0.0</fileVersion>
-    <txtFileVersion>1.0.0</txtFileVersion>
-    <fileDescription>VS Code Font Configuration</fileDescription>
-    <copyright>Copyright 2025</copyright>
-    <productVersion>1.0.0.0</productVersion>
-    <txtProductVersion>1.0.0</txtProductVersion>
-    <productName>VS Code Font Tool</productName>
-    <internalName>VSCodeFontTool</internalName>
-    <originalFilename>VSCodeFontTool.exe</originalFilename>
+    <fileVersion>1.2.0.0</fileVersion>
+    <txtFileVersion>1.2.0</txtFileVersion>
+    <fileDescription>Minecraft Font Configuration Tool for Visual Studio Code</fileDescription>
+    <copyright>Copyright © 2025</copyright>
+    <productVersion>1.2.0.0</productVersion>
+    <txtProductVersion>1.2.0</txtProductVersion>
+    <productName>Minecraft Font Tool for VS Code</productName>
+    <companyName></companyName>
+    <internalName>MinecraftFontTool</internalName>
+    <originalFilename>Minecraft Font Tool for VSC.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
   <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>11</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <bundledJre64Bit>false</bundledJre64Bit>
+    <runtimeBits>64/32</runtimeBits>
   </jre>
 </launch4jConfig>
 "@
-    # Save as UTF8 without BOM which Launch4j prefers
-    $launch4jXml | Out-File -FilePath $launch4jConfig -Encoding utf8
-    Write-Host 'Default Launch4j config created. Edit launch4j-config.xml as needed.'
-}
+# Save as UTF8 without BOM which Launch4j prefers
+$launch4jXml | Out-File -FilePath $launch4jConfig -Encoding utf8
+Write-Host 'Launch4j config generated with version 1.2.0'
 
 
 # 4. Run Launch4j using absolute path
