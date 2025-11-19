@@ -1,0 +1,20 @@
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>MinecraftFontInstaller.jar</jar>
+  <outfile>MinecraftFontInstaller.exe</outfile>
+  <errTitle>Minecraft Font Installer</errTitle>
+  <jarArgs></jarArgs>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://adoptium.net/</downloadUrl>
+  <supportUrl></supportUrl>
+  <manifest></manifest>
+  <icon></icon>
+  <jre>
+    <minVersion>11</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <bundledJre64Bit>false</bundledJre64Bit>
+  </jre>
+</launch4jConfig>
