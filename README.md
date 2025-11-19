@@ -72,7 +72,7 @@ The output will be: `Monocraft Font Tool for VSC.exe`
 ```
 vsc-mc-script/
 ├── src/
-│   └── com/beispiel/
+│   └── com/example/
 │       ├── MonocraftFontInstaller.java   # Entry point (main class)
 │       ├── MainWindow.java               # GUI components and event handlers
 │       ├── FontInstaller.java            # Font installation/uninstallation logic
@@ -91,10 +91,10 @@ vsc-mc-script/
 │           └── Monocraft.ttf
 ├── build/
 │   ├── classes/
-│   │   └── com/beispiel/
-│   │       ├── MonocraftFontInstaller.class
-│   │       ├── MainWindow.class
-│   │       ├── FontInstaller.class
+│   │   └── com/example/
+│       │       ├── MonocraftFontInstaller.class
+│       │       ├── MainWindow.class
+│       │       ├── FontInstaller.class
 │   │       ├── SettingsManager.class
 │   │       ├── FileUtils.class
 │   │       └── SystemUtils.class

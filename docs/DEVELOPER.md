@@ -4,7 +4,7 @@
 
 ```
 vsc-mc-script/
-├── src/com/beispiel/
+├── src/com/example/
 │   ├── MonocraftFontInstaller.java   # Entry point
 │   ├── MainWindow.java               # GUI components
 │   ├── FontInstaller.java            # Font install/uninstall logic

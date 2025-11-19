@@ -7,7 +7,7 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Split-Path -Parent $scriptDir
 $srcDir = Join-Path $projectRoot 'src'
-$javaSourceDir = Join-Path $srcDir 'com\beispiel'
+$javaSourceDir = Join-Path $srcDir 'com\example'
 $buildDir = Join-Path $projectRoot 'build'
 $classDir = Join-Path $buildDir 'classes'
 $jarName = 'MonocraftFontInstaller.jar'
@@ -45,7 +45,7 @@ if (Test-Path $iconPath) {
 Write-Host 'Creating JAR file...'
 if (!(Test-Path $manifest)) {
     # Create a default manifest if not present
-    Set-Content -Path $manifest -Value "Main-Class: com.beispiel.MonocraftFontInstaller`r`n"
+    Set-Content -Path $manifest -Value "Main-Class: com.example.MonocraftFontInstaller`r`n"
 }
 # If Monocraft-font exists, include it in the jar so fonts are bundled
 $fontsPath = Join-Path $projectRoot 'resources\fonts\Monocraft-font'

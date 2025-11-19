@@ -1,4 +1,4 @@
-package com.beispiel;
+package com.example;
 
 import javax.swing.SwingUtilities;
 import java.util.Locale;

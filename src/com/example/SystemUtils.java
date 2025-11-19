@@ -1,4 +1,4 @@
-package com.beispiel;
+package com.example;
 
 import java.io.IOException;
 
