@@ -53,10 +53,10 @@ Build steps:
 cd vsc-mc-script
 
 # (Optional) Create an icon
-.\create-icon.ps1
+.\scripts\create-icon.ps1
 
 # Build the executable
-.\rebuild.ps1
+.\scripts\rebuild.ps1
 ```
 
 The output will be: `Monocraft Font Tool for VSC.exe`
@@ -65,30 +65,46 @@ The output will be: `Monocraft Font Tool for VSC.exe`
 
 ```
 vsc-mc-script/
-├── com/beispiel/
-│   └── MonocraftFontInstaller.java    # Main application
-├── Monocraft-font/                     # Font files (bundled into JAR)
-│   ├── Monocraft-nerd-fonts-patched.ttc
-│   └── Monocraft-ttf-otf/other-formats/Monocraft.ttf
-├── build-monocraft-font-installer.ps1  # Build script
-├── clean.ps1                           # Clean build artifacts
-├── rebuild.ps1                         # Clean + Build
-├── create-icon.ps1                     # Generate app icon
-└── SIGNING.md                          # Code signing guide
+├── src/                                # Source code
+│   └── com/beispiel/
+│       └── MonocraftFontInstaller.java
+├── scripts/                            # Build scripts
+│   ├── build.ps1                       # Main build script
+│   ├── clean.ps1                       # Clean artifacts
+│   ├── rebuild.ps1                     # Clean + Build
+│   └── create-icon.ps1                 # Generate app icon
+├── resources/                          # Resources to bundle
+│   └── fonts/
+│       └── Monocraft-font/             # Font files
+│           ├── Monocraft-nerd-fonts-patched.ttc
+│           └── Monocraft-ttf-otf/other-formats/Monocraft.ttf
+├── build/                              # Build artifacts (gitignored)
+│   ├── classes/                        # Compiled .class files
+│   │   └── com/beispiel/
+│   │       └── MonocraftFontInstaller.class
+│   ├── MonocraftFontInstaller.jar      # Compiled JAR
+│   ├── manifest.txt                    # JAR manifest
+│   ├── launch4j-config.xml             # Launch4j config
+│   └── launch4j.log                    # Build log
+├── docs/                               # Documentation
+│   └── SIGNING.md                      # Code signing guide
+├── app-icon.ico                        # Application icon
+├── Monocraft Font Tool for VSC.exe     # Final executable
+└── README.md                           # This file
 ```
 
 ## Build Scripts
 
-### `.\rebuild.ps1`
+### `.\scripts\rebuild.ps1`
 Clean build from scratch (recommended)
 
-### `.\build-monocraft-font-installer.ps1`
+### `.\scripts\build.ps1`
 Compile, package JAR, and create EXE with Launch4j
 
-### `.\clean.ps1`
+### `.\scripts\clean.ps1`
 Remove all build artifacts (.class, .jar, .exe, configs)
 
-### `.\create-icon.ps1`
+### `.\scripts\create-icon.ps1`
 Generate a Minecraft-style icon for the application
 
 ## Packaging Features
@@ -105,19 +121,19 @@ View by right-clicking the EXE → Properties → Details tab
 ### Icon Support
 The build script automatically includes `app-icon.ico` if present. Create one with:
 ```powershell
-.\create-icon.ps1
+.\scripts\create-icon.ps1
 ```
 
 ### Digital Signing (Optional)
 For production distribution, digitally sign the EXE to reduce SmartScreen warnings.
 
-See [SIGNING.md](SIGNING.md) for complete guide. Quick example:
+See [docs/SIGNING.md](docs/SIGNING.md) for complete guide. Quick example:
 ```powershell
 signtool sign /a /n "Your Certificate" /t http://timestamp.digicert.com /fd SHA256 "Minecraft Font Tool for VSC.exe"
 ```
 
 ### Bundled Fonts
-Fonts are automatically bundled into the JAR during build if the `Monocraft-font` folder exists. The app extracts them at runtime, so you can distribute a single EXE file.
+Fonts are automatically bundled into the JAR during build if the `resources/fonts/Monocraft-font` folder exists. The app extracts them at runtime, so you can distribute a single EXE file.
 
 ## How It Works
 
@@ -153,8 +169,8 @@ Fonts are automatically bundled into the JAR during build if the `Monocraft-font
 - Check font installation: Windows Settings → Personalization → Fonts
 
 ### "Font files not found" error
-- Ensure `Monocraft-font` folder is next to the EXE (if fonts not bundled)
-- Or rebuild with fonts bundled: `.\rebuild.ps1`
+- Ensure `resources/fonts/Monocraft-font` folder is present (if fonts not bundled)
+- Or rebuild with fonts bundled: `.\scripts\rebuild.ps1`
 
 ### Settings not applied
 - Close VS Code before clicking "Add Minecraft Font"

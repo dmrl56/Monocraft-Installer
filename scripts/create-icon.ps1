@@ -1,7 +1,9 @@
 # Simple script to create a basic icon for the application
 # This creates a 256x256 pixel icon with a Minecraft-style block design
 
-$iconPath = Join-Path $PSScriptRoot 'app-icon.ico'
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$projectRoot = Split-Path -Parent $scriptDir
+$iconPath = Join-Path $projectRoot 'app-icon.ico'
 
 # Check if icon already exists
 if (Test-Path $iconPath) {

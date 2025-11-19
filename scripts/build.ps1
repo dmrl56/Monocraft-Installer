@@ -1,23 +1,34 @@
 # This PowerShell script automates the process of compiling, packaging, and preparing a Windows EXE from your Java project using Launch4j.
 # Adjust paths as needed for your environment.
 
-# Run with .\build-minecraft-font-installer.ps1
+# Run with .\scripts\build.ps1
 
 # Set variables
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$srcDir = Join-Path $projectRoot 'com\beispiel'
-$mainJava = Join-Path $srcDir 'MonocraftFontInstaller.java'
-$classDir = $projectRoot
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$projectRoot = Split-Path -Parent $scriptDir
+$srcDir = Join-Path $projectRoot 'src'
+$mainJava = Join-Path $srcDir 'com\beispiel\MonocraftFontInstaller.java'
+$buildDir = Join-Path $projectRoot 'build'
+$classDir = Join-Path $buildDir 'classes'
 $jarName = 'MonocraftFontInstaller.jar'
-$jarPath = Join-Path $projectRoot $jarName
-$manifest = Join-Path $projectRoot 'manifest.txt'
-$launch4jConfig = Join-Path $projectRoot 'launch4j-config.xml'
+$jarPath = Join-Path $buildDir $jarName
+$manifest = Join-Path $buildDir 'manifest.txt'
+$launch4jConfig = Join-Path $buildDir 'launch4j-config.xml'
 $exeName = 'Monocraft Font Tool for VSC.exe'
 $exePath = Join-Path $projectRoot $exeName
 
+# Ensure build directory exists
+if (!(Test-Path $buildDir)) {
+    New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
+    Write-Host 'Created build directory' -ForegroundColor Gray
+}
+if (!(Test-Path $classDir)) {
+    New-Item -ItemType Directory -Path $classDir -Force | Out-Null
+}
+
 # 1. Compile Java code
 Write-Host 'Compiling Java source...'
-javac $mainJava
+javac -d $classDir $mainJava
 if ($LASTEXITCODE -ne 0) { Write-Error 'Java compilation failed.'; exit 1 }
 
 # Check for icon
@@ -25,7 +36,7 @@ $iconPath = Join-Path $projectRoot 'app-icon.ico'
 if (Test-Path $iconPath) {
     Write-Host 'Found icon file: app-icon.ico' -ForegroundColor Green
 } else {
-    Write-Host 'No icon found. Run .\create-icon.ps1 to create one.' -ForegroundColor Yellow
+    Write-Host 'No icon found. Run .\scripts\create-icon.ps1 to create one.' -ForegroundColor Yellow
 }
 
 # 2. Create JAR file with manifest
@@ -35,11 +46,12 @@ if (!(Test-Path $manifest)) {
     Set-Content -Path $manifest -Value "Main-Class: com.beispiel.MonocraftFontInstaller`r`n"
 }
 # If Monocraft-font exists, include it in the jar so fonts are bundled
-if (Test-Path (Join-Path $projectRoot 'Monocraft-font')) {
+$fontsPath = Join-Path $projectRoot 'resources\fonts\Monocraft-font'
+if (Test-Path $fontsPath) {
   Write-Host 'Including Monocraft-font folder in JAR'
-  jar cfm $jarName $manifest -C $classDir com -C $projectRoot Monocraft-font
+  jar cfm $jarPath $manifest -C $classDir com -C (Join-Path $projectRoot 'resources\fonts') Monocraft-font
 } else {
-  jar cfm $jarName $manifest -C $classDir com
+  jar cfm $jarPath $manifest -C $classDir com
 }
 if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 
@@ -106,7 +118,7 @@ Start-Sleep -Milliseconds 300
 
 # Run Launch4j and capture output
 $launch4jExe = 'C:\Program Files (x86)\Launch4j\launch4j.exe'
-$logFile = Join-Path $projectRoot 'launch4j.log'
+$logFile = Join-Path $buildDir 'launch4j.log'
 & $launch4jExe $launch4jConfig *>&1 | Tee-Object -FilePath $logFile
 if ($LASTEXITCODE -ne 0) {
   Write-Error "Launch4j packaging failed. See $logFile for details."

@@ -1,14 +1,15 @@
 # Rebuild script - cleans and builds the project
-# Run with .\rebuild.ps1
+# Run with .\scripts\rebuild.ps1
 
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$projectRoot = Split-Path -Parent $scriptDir
 
 Write-Host '=== Starting Rebuild ===' -ForegroundColor Cyan
 Write-Host ''
 
 # 1. Run clean script
 Write-Host 'Step 1: Cleaning...' -ForegroundColor Yellow
-& (Join-Path $projectRoot 'clean.ps1')
+& (Join-Path $scriptDir 'clean.ps1')
 if ($LASTEXITCODE -ne 0) {
     Write-Error 'Clean failed!'
     exit 1
@@ -21,7 +22,7 @@ Start-Sleep -Milliseconds 500
 # 2. Run build script
 Write-Host ''
 Write-Host 'Step 2: Building...' -ForegroundColor Yellow
-& (Join-Path $projectRoot 'build-monocraft-font-installer.ps1')
+& (Join-Path $scriptDir 'build.ps1')
 if ($LASTEXITCODE -ne 0) {
     Write-Error 'Build failed!'
     exit 1
