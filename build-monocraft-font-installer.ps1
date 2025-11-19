@@ -1,7 +1,7 @@
 # This PowerShell script automates the process of compiling, packaging, and preparing a Windows EXE from your Java project using Launch4j.
 # Adjust paths as needed for your environment.
 
-# Run with .\build-minecraft-font-installer.ps1
+# Run with .\build-monocraft-font-installer.ps1
 
 # Set variables
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MinecraftFontInstaller {
+public class MonocraftFontInstaller {
     private static final String FONT_FAMILY = "Monocraft, 'Monocraft Nerd Font', Consolas, 'Courier New', monospace";
     private static final String TERMINAL_FONT = "Monocraft Nerd Font";
 
@@ -22,14 +22,15 @@ public class MinecraftFontInstaller {
     }
 
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Minecraft Font Tool");
+        JFrame frame = new JFrame("Monocraft Font Tool");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 280);
+    // Make the window wider so long button labels fit
+    frame.setSize(760, 280);
         frame.setLayout(new BorderLayout());
         frame.getContentPane().setBackground(new Color(34, 40, 49));
 
         // Title label
-        JLabel titleLabel = new JLabel("Minecraft Font for VS Code", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Monocraft Font for VS Code", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setForeground(new Color(255, 211, 105));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
@@ -56,8 +57,8 @@ public class MinecraftFontInstaller {
         settingsPanel.setBackground(new Color(34, 40, 49));
         settingsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton addButton = new JButton("Add Minecraft Font");
-        JButton removeButton = new JButton("Remove Minecraft Font");
+        JButton addButton = new JButton("Add Monocraft Font");
+        JButton removeButton = new JButton("Remove Monocraft Font");
 
         // Style all buttons consistently
         Font buttonFont = new Font("Segoe UI", Font.PLAIN, 16);
@@ -67,30 +68,30 @@ public class MinecraftFontInstaller {
         installButton.setBackground(new Color(72, 149, 239));
         installButton.setForeground(Color.WHITE);
         installButton.setFocusPainted(false);
-        installButton.setPreferredSize(new Dimension(200, 50));
-        installButton.setMaximumSize(new Dimension(200, 50));
+    installButton.setPreferredSize(new Dimension(320, 50));
+    installButton.setMaximumSize(new Dimension(320, 50));
 
         uninstallButton.setFont(buttonFont);
         uninstallButton.setBackground(new Color(255, 159, 64));
         uninstallButton.setForeground(Color.WHITE);
         uninstallButton.setFocusPainted(false);
-        uninstallButton.setPreferredSize(new Dimension(200, 50));
-        uninstallButton.setMaximumSize(new Dimension(200, 50));
+    uninstallButton.setPreferredSize(new Dimension(320, 50));
+    uninstallButton.setMaximumSize(new Dimension(320, 50));
 
         // Add/Remove buttons - green/red theme
         addButton.setFont(buttonFont);
         addButton.setBackground(new Color(57, 255, 20));
         addButton.setForeground(Color.BLACK);
         addButton.setFocusPainted(false);
-        addButton.setPreferredSize(new Dimension(200, 50));
-        addButton.setMaximumSize(new Dimension(200, 50));
+    addButton.setPreferredSize(new Dimension(320, 50));
+    addButton.setMaximumSize(new Dimension(320, 50));
 
         removeButton.setFont(buttonFont);
         removeButton.setBackground(new Color(255, 71, 87));
         removeButton.setForeground(Color.WHITE);
         removeButton.setFocusPainted(false);
-        removeButton.setPreferredSize(new Dimension(200, 50));
-        removeButton.setMaximumSize(new Dimension(200, 50));
+    removeButton.setPreferredSize(new Dimension(320, 50));
+    removeButton.setMaximumSize(new Dimension(320, 50));
 
         // Add action listeners
         installButton.addActionListener(e -> showInstallMenu(installButton));
@@ -142,7 +143,7 @@ public class MinecraftFontInstaller {
         int choice = JOptionPane.showConfirmDialog(null, 
             "Please close Visual Studio Code before uninstalling fonts.\n\n" +
             "This will:\n" +
-            "1. Remove Minecraft font settings from VS Code\n" +
+            "1. Remove Monocraft font settings from VS Code\n" +
             "2. Uninstall font files from Windows\n\n" +
             "Have you closed VS Code?", 
             "Close VS Code First", 
@@ -361,9 +362,9 @@ public class MinecraftFontInstaller {
                 if (alsoAddToVSCode) {
                     // Also add to VS Code settings
                     modifySettings(true, false);
-                    JOptionPane.showMessageDialog(null, "Fonts installed and added to VS Code successfully!\n\nRestart VS Code to use the Minecraft font.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Fonts installed and added to VS Code successfully!\n\nRestart VS Code to use the Monocraft font.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Fonts installed successfully for the current user.\n\nUse 'Add Minecraft Font' button to configure VS Code.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Fonts installed successfully for the current user.\n\nUse 'Add Monocraft Font' button to configure VS Code.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Fonts copied but verification failed. You may need to sign out/in.", "Partial Success", JOptionPane.WARNING_MESSAGE);
@@ -413,7 +414,7 @@ public class MinecraftFontInstaller {
         for (String c : candidates) {
             java.io.InputStream is = null;
             try {
-                is = MinecraftFontInstaller.class.getResourceAsStream(c);
+                is = MonocraftFontInstaller.class.getResourceAsStream(c);
                 if (is == null) continue;
                 
                 Path out = tmpDir.resolve(Paths.get(c).getFileName().toString());
@@ -501,9 +502,9 @@ public class MinecraftFontInstaller {
 /*
  * How to create a .exe from .java
  * 1. Compile the Java code to bytecode using javac:
- *    javac com\beispiel\MinecraftFontInstaller.java
+ *    javac com\beispiel\MonocraftFontInstaller.java
  * 2. Create a JAR file from the compiled classes:
- *    jar cfm MinecraftFontInstaller.jar manifest.txt -C . com
+ *    jar cfm MonocraftFontInstaller.jar manifest.txt -C . com
  * 3. Use a tool like Launch4j or JSmooth to wrap the JAR file in a Windows executable.
  * 4. Configure the wrapper tool with the JAR file and any required JVM options.
  * 5. Build the executable and distribute it.

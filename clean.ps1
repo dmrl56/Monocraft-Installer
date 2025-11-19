@@ -11,14 +11,14 @@ Get-ChildItem -Path $projectRoot -Filter *.class -Recurse | Remove-Item -Force
 Write-Host 'Deleted .class files'
 
 # Delete JAR file
-$jarFile = Join-Path $projectRoot 'MinecraftFontInstaller.jar'
+$jarFile = Join-Path $projectRoot 'MonocraftFontInstaller.jar'
 if (Test-Path $jarFile) {
     Remove-Item $jarFile -Force
     Write-Host 'Deleted JAR file'
 }
 
 # Delete EXE file
-$exeFile = Join-Path $projectRoot 'Minecraft Font Tool for VSC.exe'
+$exeFile = Join-Path $projectRoot 'Monocraft Font Tool for VSC.exe'
 if (Test-Path $exeFile) {
     Remove-Item $exeFile -Force
     Write-Host 'Deleted EXE file'
@@ -66,3 +66,6 @@ if (Test-Path $manifestFile) {
 # }
 
 Write-Host 'Clean complete!'
+
+# Explicitly exit with success code
+exit 0

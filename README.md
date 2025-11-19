@@ -1,10 +1,10 @@
-# Minecraft Font Tool for VS Code
+# Monocraft Font Tool for VS Code
 
 A simple Windows GUI tool to install Monocraft fonts and configure Visual Studio Code font settings with one click.
 
 ## Features
 
-- ✅ **Add/Remove Minecraft Font**: Toggle Monocraft font in VS Code settings with one button
+- ✅ **Add/Remove Monocraft Font**: Toggle Monocraft font in VS Code settings with one button
 - 🎨 **Install/Uninstall Fonts**: Install Monocraft fonts for the current user (no admin rights required)
 - 📦 **Bundled Fonts**: Fonts can be embedded in the executable for single-file distribution
 - 🎯 **User-Level Installation**: No UAC prompts or administrator privileges needed
@@ -12,7 +12,7 @@ A simple Windows GUI tool to install Monocraft fonts and configure Visual Studio
 
 ## What It Does
 
-### Add Minecraft Font Button
+### Add Monocraft Font Button
 Sets these VS Code settings:
 ```json
 {
@@ -32,10 +32,10 @@ Sets these VS Code settings:
 
 ### For Users
 
-1. **Download** the executable: `Minecraft Font Tool for VSC.exe`
+1. **Download** the executable: `Monocraft Font Tool for VSC.exe`
 2. **Run** the application (no installation needed)
 3. Click **"Install Fonts"** to install the Monocraft fonts
-4. Click **"Add Minecraft Font"** to configure VS Code
+4. Click **"Add Monocraft Font"** to configure VS Code
 5. Restart VS Code to see the changes
 
 ### For Developers
@@ -59,18 +59,18 @@ cd vsc-mc-script
 .\rebuild.ps1
 ```
 
-The output will be: `Minecraft Font Tool for VSC.exe`
+The output will be: `Monocraft Font Tool for VSC.exe`
 
 ## Project Structure
 
 ```
 vsc-mc-script/
 ├── com/beispiel/
-│   └── MinecraftFontInstaller.java    # Main application
+│   └── MonocraftFontInstaller.java    # Main application
 ├── Monocraft-font/                     # Font files (bundled into JAR)
 │   ├── Monocraft-nerd-fonts-patched.ttc
 │   └── Monocraft-ttf-otf/other-formats/Monocraft.ttf
-├── build-minecraft-font-installer.ps1  # Build script
+├── build-monocraft-font-installer.ps1  # Build script
 ├── clean.ps1                           # Clean build artifacts
 ├── rebuild.ps1                         # Clean + Build
 ├── create-icon.ps1                     # Generate app icon
@@ -82,7 +82,7 @@ vsc-mc-script/
 ### `.\rebuild.ps1`
 Clean build from scratch (recommended)
 
-### `.\build-minecraft-font-installer.ps1`
+### `.\build-monocraft-font-installer.ps1`
 Compile, package JAR, and create EXE with Launch4j
 
 ### `.\clean.ps1`

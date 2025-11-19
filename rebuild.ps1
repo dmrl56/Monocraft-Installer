@@ -21,7 +21,7 @@ Start-Sleep -Milliseconds 500
 # 2. Run build script
 Write-Host ''
 Write-Host 'Step 2: Building...' -ForegroundColor Yellow
-& (Join-Path $projectRoot 'build-minecraft-font-installer.ps1')
+& (Join-Path $projectRoot 'build-monocraft-font-installer.ps1')
 if ($LASTEXITCODE -ne 0) {
     Write-Error 'Build failed!'
     exit 1
