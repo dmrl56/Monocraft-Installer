@@ -1,5 +1,5 @@
-# Pfad zur settings.json
-$settingsPath = "C:\Users\dmorl\AppData\Roaming\Code\User\settings.json"
+# Pfad zur settings.json (absolut im Benutzerprofil)
+$settingsPath = Join-Path $env:USERPROFILE 'AppData\Roaming\Code\User\settings.json'
 
 # settings.json einlesen
 $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json

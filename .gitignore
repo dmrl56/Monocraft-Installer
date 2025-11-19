@@ -1,0 +1,14 @@
+# Ignore compiled classes, Java archives, XML files, and executables
+*.class
+*.jar
+*.xml
+*.exe
+
+# Ignore log files
+*.log
+
+# Ignore VS Code user settings
+settings.json
+
+# Ignore manifest files
+manifest.txt
