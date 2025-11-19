@@ -25,6 +25,7 @@
   ```json
   {
     "editor.fontFamily": "Monocraft, 'Monocraft Nerd Font', Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true,
     "terminal.integrated.fontFamily": "Monocraft Nerd Font"
   }
   ```
@@ -135,7 +136,6 @@ The EXE includes proper Windows version metadata:
 - **Version**: 1.3.1.0
 - **Product Name**: Monocraft Font Tool for VS Code
 - **Description**: Monocraft Font Configuration Tool for Visual Studio Code
-- **Copyright**: © 2025
 
 View by right-clicking the EXE → Properties → Details tab
 
@@ -209,7 +209,8 @@ Feel free to:
 - Report issues
 - Suggest improvements
 - Submit pull requests
-- Share with others who use VS Code and like Minecraft fonts!
+
+For more details, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ---
 
