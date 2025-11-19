@@ -1,6 +1,8 @@
 # Monocraft Font Tool for VS Code
 
-A simple, user-friendly Windows GUI tool to install Monocraft fonts and configure Visual Studio Code font settings with one click.
+**A modern, user-friendly Windows GUI to install Monocraft fonts and configure Visual Studio Code font settings in one click.**
+
+---
 
 ## Features
 
@@ -10,6 +12,8 @@ A simple, user-friendly Windows GUI tool to install Monocraft fonts and configur
 - **User-Level Installation**: No UAC prompts or administrator privileges needed
 - **Smart Settings Management**: Preserves your existing VS Code settings structure
 - **Modern, Maintainable Codebase**: Modular Java code with clear separation of concerns
+
+---
 
 ## How It Works
 
@@ -25,6 +29,8 @@ A simple, user-friendly Windows GUI tool to install Monocraft fonts and configur
   }
   ```
 - **Remove Monocraft Font**: Restores your previous VS Code font settings.
+
+---
 
 ## Quick Start
 
@@ -57,6 +63,8 @@ cd vsc-mc-script
 .\scripts\rebuild.ps1
 ```
 The output will be: `Monocraft Font Tool for VSC.exe`
+
+---
 
 ## Code Structure
 
@@ -96,21 +104,13 @@ vsc-mc-script/
 └── docs/                                 # Documentation
 ```
 
+---
+
 ## Documentation
 
 See the [`docs/`](./docs/) folder for detailed documentation, usage tips, and troubleshooting.
 
 ---
-
-**Version:** 1.3.1
-
-**License:** MIT
-├── docs/                               # Documentation
-│   └── SIGNING.md                      # Code signing guide
-├── app-icon.ico                        # Application icon
-├── Monocraft Font Tool for VSC.exe     # Final executable
-└── README.md                           # This file
-```
 
 ## Build Scripts
 
@@ -126,13 +126,15 @@ Remove all build artifacts (.class, .jar, .exe, configs)
 ### `.\scripts\create-icon.ps1`
 Generate a Minecraft-style icon for the application
 
+---
+
 ## Packaging Features
 
 ### Version Information
 The EXE includes proper Windows version metadata:
-- **Version**: 1.2.0.0
-- **Product Name**: Minecraft Font Tool for VS Code
-- **Description**: Minecraft Font Configuration Tool for Visual Studio Code
+- **Version**: 1.3.1.0
+- **Product Name**: Monocraft Font Tool for VS Code
+- **Description**: Monocraft Font Configuration Tool for Visual Studio Code
 - **Copyright**: © 2025
 
 View by right-clicking the EXE → Properties → Details tab
@@ -143,16 +145,10 @@ The build script automatically includes `app-icon.ico` if present. Create one wi
 .\scripts\create-icon.ps1
 ```
 
-### Digital Signing (Optional)
-For production distribution, digitally sign the EXE to reduce SmartScreen warnings.
-
-See [docs/SIGNING.md](docs/SIGNING.md) for complete guide. Quick example:
-```powershell
-signtool sign /a /n "Your Certificate" /t http://timestamp.digicert.com /fd SHA256 "Minecraft Font Tool for VSC.exe"
-```
-
 ### Bundled Fonts
 Fonts are automatically bundled into the JAR during build if the `resources/fonts/Monocraft-font` folder exists. The app extracts them at runtime, so you can distribute a single EXE file.
+
+---
 
 ## How It Works
 
@@ -174,11 +170,15 @@ Fonts are automatically bundled into the JAR during build if the `resources/font
 - Deletes registry entries
 - Safe to run multiple times
 
+---
+
 ## Requirements
 
 - **Windows 10/11** (tested on Windows 11)
 - **Java Runtime Environment (JRE) 11+** (automatically detected, prompts for download if missing)
 - **Visual Studio Code** (for font configuration features)
+
+---
 
 ## Troubleshooting
 
@@ -201,6 +201,8 @@ Fonts are automatically bundled into the JAR during build if the `resources/font
 - Check Launch4j installed at: `C:\Program Files (x86)\Launch4j\`
 - Run as Administrator if file permission errors occur
 
+---
+
 ## Contributing
 
 Feel free to:
@@ -209,17 +211,15 @@ Feel free to:
 - Submit pull requests
 - Share with others who use VS Code and like Minecraft fonts!
 
+---
+
 ## License
 
-This tool is provided as-is for personal and educational use.
+This project is licensed under the MIT License.
 
-The Monocraft font is subject to its own license (typically OFL - SIL Open Font License).
+---
 
 ## Credits
 
 - **Monocraft Font**: [Monocraft by IdreesInc](https://github.com/IdreesInc/Monocraft)
 - **Launch4j**: [SourceForge Launch4j](https://launch4j.sourceforge.net/)
-
----
-
-**Made with ❤️ for VS Code and Minecraft font enthusiasts**
