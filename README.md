@@ -133,7 +133,7 @@ Generate a Minecraft-style icon for the application
 
 ### Version Information
 The EXE includes proper Windows version metadata:
-- **Version**: 1.3.1.0
+- **Version**: 1.3.2.0
 - **Product Name**: Monocraft Font Tool for VS Code
 - **Description**: Monocraft Font Configuration Tool for Visual Studio Code
 

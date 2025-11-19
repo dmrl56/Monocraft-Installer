@@ -61,7 +61,7 @@ if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 $iconPath = Join-Path $projectRoot 'app-icon.ico'
 $iconXml = if (Test-Path $iconPath) { "<icon>$iconPath</icon>" } else { "<icon></icon>" }
 
-$exeVersion = '1.3.1.0'
+$exeVersion = '1.3.2.0'
 $launch4jXml = @"
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
@@ -84,11 +84,11 @@ $launch4jXml = @"
   </singleInstance>
   <versionInfo>
     <fileVersion>$exeVersion</fileVersion>
-    <txtFileVersion>1.3.1</txtFileVersion>
+  <txtFileVersion>1.3.2</txtFileVersion>
     <fileDescription>Monocraft Font Configuration Tool for Visual Studio Code</fileDescription>
     <copyright>Copyright © 2025</copyright>
     <productVersion>$exeVersion</productVersion>
-    <txtProductVersion>1.3.1</txtProductVersion>
+  <txtProductVersion>1.3.2</txtProductVersion>
     <productName>Monocraft Font Tool for VS Code</productName>
     <companyName></companyName>
     <internalName>MonocraftFontTool</internalName>
@@ -109,7 +109,7 @@ $launch4jXml = @"
 "@
 # Save as UTF8 without BOM which Launch4j prefers
 $launch4jXml | Out-File -FilePath $launch4jConfig -Encoding utf8
-Write-Host 'Launch4j config generated with version 1.3.0'
+Write-Host "Launch4j config generated with version $exeVersion"
 
 
 # 4. Run Launch4j using absolute path
