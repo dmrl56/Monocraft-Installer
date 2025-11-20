@@ -37,7 +37,7 @@
 
 ### For Users
 
-1. **Download** the latest installer: `MonocraftFontTool-1.3.3.exe`
+1. **Download** the latest installer: [`MonocraftFontTool-1.3.3.exe`](https://github.com/dmrl56/Monocraft-Installer/releases)
 2. **Run** the installer and follow the setup wizard
 3. **Complete installation** - The application will launch automatically when you click "Finish"
 4. Click **Install Fonts** to install the Monocraft fonts
