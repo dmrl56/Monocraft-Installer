@@ -37,11 +37,14 @@
 
 ### For Users
 
-1. **Download** the latest executable: `Monocraft Font Tool for VSC.exe`
-2. **Run** the application (no installation needed)
-3. Click **Install Fonts** to install the Monocraft fonts
-4. Click **Add Monocraft Font** to configure VS Code
-5. Restart VS Code to see the changes
+1. **Download** the latest installer: `MonocraftFontTool-1.3.3.exe`
+2. **Run** the installer and follow the setup wizard
+3. **Complete installation** - The application will launch automatically when you click "Finish"
+4. Click **Install Fonts** to install the Monocraft fonts
+5. Click **Add Monocraft Font** to configure VS Code
+6. Restart VS Code to see the changes
+
+**No Java installation required!** The installer bundles everything you need.
 
 ### For Developers
 
@@ -49,10 +52,13 @@
 
 **Requirements:**
 - Windows 10/11
-- JDK 11 or higher
-- [Launch4j](https://launch4j.sourceforge.net/) installed at `C:\Program Files (x86)\Launch4j\`
+- JDK 17 or higher (includes jpackage for native packaging)
+- WiX Toolset 3.14+ (for installer builds - install via `scoop install versions/wixtoolset3`)
 
-**Build steps:**
+**Default Build Method: Windows Installer (Recommended)**
+
+This creates a single-file installer that works on any Windows PC without requiring Java.
+
 ```powershell
 # Clone or download this repository
 cd vsc-mc-script
@@ -60,10 +66,31 @@ cd vsc-mc-script
 # (Optional) Create an icon
 .\scripts\create-icon.ps1
 
-# Build the executable
+# Build the installer (default: single-file .exe installer)
 .\scripts\rebuild.ps1
+
+# Output: build\package\MonocraftFontTool-1.3.3.exe (42 MB)
+# Upload this single file to GitHub releases
 ```
-The output will be: `Monocraft Font Tool for VSC.exe`
+
+**Alternative package types:**
+```powershell
+.\scripts\rebuild.ps1 -PackageType app-image  # Portable folder (no installer)
+.\scripts\rebuild.ps1 -PackageType msi        # MSI installer
+```
+
+**Alternative Build Method: Launch4j Wrapper (smaller, requires Java on target)**
+
+For users who already have Java 11+ installed:
+
+```powershell
+# Build with Launch4j wrapper
+.\scripts\rebuild-launch4j.ps1
+
+# Output: Monocraft Font Tool for VSC.exe (~2 MB, requires Java 11+ on target)
+```
+
+Note: Launch4j requires [Launch4j](https://launch4j.sourceforge.net/) installed at `C:\Program Files (x86)\Launch4j\`
 
 ---
 
@@ -115,11 +142,29 @@ See the [`docs/`](./docs/) folder for detailed documentation, usage tips, and tr
 
 ## Build Scripts
 
-### `.\scripts\rebuild.ps1`
-Clean build from scratch (recommended)
+### `.\scripts\rebuild.ps1` (Default - Recommended)
+Clean build from scratch using jpackage to create Windows installer with bundled JRE
+- No Java required on target machine
+- Single-file installer (42 MB)
+- Supports: `-PackageType exe` (default), `-PackageType app-image`, `-PackageType msi`
 
 ### `.\scripts\build.ps1`
-Compile, package JAR, and create EXE with Launch4j
+Compile Java, create JAR, and package with jpackage (called by rebuild.ps1)
+
+### `.\scripts\package.ps1`
+Create native package with bundled JRE using jpackage (JDK 17+ required)
+- `-Type exe` - Windows installer (default)
+- `-Type app-image` - Portable folder with EXE and runtime
+- `-Type msi` - MSI installer (requires WiX Toolset)
+
+### `.\scripts\rebuild-launch4j.ps1` (Alternative)
+Clean build using Launch4j wrapper
+- Small file size (~1-2 MB)
+- Requires Java 11+ on target machine
+- Requires Launch4j installed
+
+### `.\scripts\build-launch4j.ps1` (Alternative)
+Compile and package with Launch4j (called by rebuild-launch4j.ps1)
 
 ### `.\scripts\clean.ps1`
 Remove all build artifacts (.class, .jar, .exe, configs)
@@ -127,13 +172,40 @@ Remove all build artifacts (.class, .jar, .exe, configs)
 ### `.\scripts\create-icon.ps1`
 Generate a Minecraft-style icon for the application
 
+### `.\scripts\sign.ps1`
+Sign the EXE/installer with a code-signing certificate (optional, for trusted distribution)
+
 ---
 
 ## Packaging Features
 
+### Distribution Methods
+
+**Windows Installer with jpackage (Default - Recommended):**
+- Single-file installer (42 MB)
+- **No Java required** on user's computer - everything is bundled
+- Professional installer with Start Menu shortcuts and uninstaller
+- **Auto-launch** - Application starts automatically after installation
+- Directory chooser - Users can select installation location
+- Best for general distribution to end users
+- Upload single file to GitHub releases
+- Build with: `.\scripts\rebuild.ps1`
+
+**Portable Folder (Alternative 1):**
+- Folder with EXE and bundled runtime (~50-60 MB total)
+- No installation required, just extract and run
+- No Java required on user's computer
+- Build with: `.\scripts\rebuild.ps1 -PackageType app-image`
+
+**Launch4j Wrapper (Alternative 2):**
+- Small EXE size (~2 MB)
+- Requires Java 11+ installed on user's computer
+- Good for users who already have Java
+- Build with: `.\scripts\rebuild-launch4j.ps1`
+
 ### Version Information
 The EXE includes proper Windows version metadata:
-- **Version**: 1.3.2.0
+- **Version**: 1.3.3.0
 - **Product Name**: Monocraft Font Tool for VS Code
 - **Description**: Monocraft Font Configuration Tool for Visual Studio Code
 

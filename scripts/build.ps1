@@ -1,9 +1,23 @@
-# This PowerShell script automates the process of compiling, packaging, and preparing a Windows EXE from your Java project using Launch4j.
-# Adjust paths as needed for your environment.
+# Monocraft Font Tool - Main Build Script
+#
+# This script builds the application using jpackage to create a standalone
+# native package with bundled JRE. This is the recommended build method.
+#
+# For the alternative Launch4j build (requires Java on target machine), 
+# use: .\scripts\build-launch4j.ps1
+#
+# Requirements:
+# - JDK 17 or higher (includes javac, jar, jlink, and jpackage)
+#
+# Run with: .\scripts\build.ps1
 
-# Run with .\scripts\build.ps1
+param(
+    [ValidateSet('app-image', 'exe', 'msi')]
+    [string]$PackageType = 'exe'
+)
 
-# Set variables
+$ErrorActionPreference = 'Stop'
+
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Split-Path -Parent $scriptDir
 $srcDir = Join-Path $projectRoot 'src'
@@ -13,9 +27,11 @@ $classDir = Join-Path $buildDir 'classes'
 $jarName = 'MonocraftFontInstaller.jar'
 $jarPath = Join-Path $buildDir $jarName
 $manifest = Join-Path $buildDir 'manifest.txt'
-$launch4jConfig = Join-Path $buildDir 'launch4j-config.xml'
-$exeName = 'Monocraft Font Tool for VSC.exe'
-$exePath = Join-Path $projectRoot $exeName
+
+Write-Host "`n================================================" -ForegroundColor Cyan
+Write-Host " Monocraft Font Tool - Build Script" -ForegroundColor Cyan
+Write-Host " Building with jpackage (standalone distribution)" -ForegroundColor Cyan
+Write-Host "================================================`n" -ForegroundColor Cyan
 
 # Ensure build directory exists
 if (!(Test-Path $buildDir)) {
@@ -27,106 +43,49 @@ if (!(Test-Path $classDir)) {
 }
 
 # 1. Compile Java code
-Write-Host 'Compiling Java source...'
-# Get all Java files in the package
+Write-Host '==> Compiling Java source...'
 $javaFiles = Get-ChildItem -Path $javaSourceDir -Filter "*.java" | ForEach-Object { $_.FullName }
 javac -d $classDir $javaFiles
-if ($LASTEXITCODE -ne 0) { Write-Error 'Java compilation failed.'; exit 1 }
-
-# Check for icon
-$iconPath = Join-Path $projectRoot 'app-icon.ico'
-if (Test-Path $iconPath) {
-    Write-Host 'Found icon file: app-icon.ico' -ForegroundColor Green
-} else {
-    Write-Host 'No icon found. Run .\scripts\create-icon.ps1 to create one.' -ForegroundColor Yellow
+if ($LASTEXITCODE -ne 0) { 
+    Write-Error 'Java compilation failed.' 
+    exit 1 
 }
+Write-Host '[OK] Java compilation successful' -ForegroundColor Green
 
 # 2. Create JAR file with manifest
-Write-Host 'Creating JAR file...'
+Write-Host '==> Creating JAR file...'
 if (!(Test-Path $manifest)) {
-    # Create a default manifest if not present
     Set-Content -Path $manifest -Value "Main-Class: com.example.MonocraftFontInstaller`r`n"
 }
-# If Monocraft-font exists, include it in the jar so fonts are bundled
+
+# Include fonts in the jar if available
 $fontsPath = Join-Path $projectRoot 'resources\fonts\Monocraft-font'
 if (Test-Path $fontsPath) {
-  Write-Host 'Including Monocraft-font folder in JAR'
-  jar cfm $jarPath $manifest -C $classDir com -C (Join-Path $projectRoot 'resources\fonts') Monocraft-font
+    Write-Host 'Including Monocraft-font folder in JAR' -ForegroundColor Gray
+    jar cfm $jarPath $manifest -C $classDir com -C (Join-Path $projectRoot 'resources\fonts') Monocraft-font
 } else {
-  jar cfm $jarPath $manifest -C $classDir com
+    jar cfm $jarPath $manifest -C $classDir com
 }
-if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 
-# 3. Create Launch4j config (always regenerate to ensure latest settings)
-$iconPath = Join-Path $projectRoot 'app-icon.ico'
-$iconXml = if (Test-Path $iconPath) { "<icon>$iconPath</icon>" } else { "<icon></icon>" }
+if ($LASTEXITCODE -ne 0) { 
+    Write-Error 'JAR creation failed.' 
+    exit 1 
+}
+Write-Host '[OK] JAR created: $jarName' -ForegroundColor Green
 
-$exeVersion = '1.3.2.0'
-$launch4jXml = @"
-<launch4jConfig>
-  <dontWrapJar>false</dontWrapJar>
-  <headerType>gui</headerType>
-  <jar>$jarPath</jar>
-  <outfile>$exePath</outfile>
-  <errTitle>Monocraft Font Tool</errTitle>
-  <cmdLine></cmdLine>
-  <chdir>.</chdir>
-  <priority>normal</priority>
-  <downloadUrl>https://adoptium.net/</downloadUrl>
-  <supportUrl>https://github.com/</supportUrl>
-  <stayAlive>false</stayAlive>
-  <restartOnCrash>false</restartOnCrash>
-  $iconXml
-  <manifest></manifest>
-  <singleInstance>
-    <mutexName>MonocraftFontToolVSC_SingleInstance</mutexName>
-    <windowTitle>Monocraft Font Tool for VS Code</windowTitle>
-  </singleInstance>
-  <versionInfo>
-    <fileVersion>$exeVersion</fileVersion>
-  <txtFileVersion>1.3.2</txtFileVersion>
-    <fileDescription>Monocraft Font Configuration Tool for Visual Studio Code</fileDescription>
-    <copyright>Copyright © 2025</copyright>
-    <productVersion>$exeVersion</productVersion>
-  <txtProductVersion>1.3.2</txtProductVersion>
-    <productName>Monocraft Font Tool for VS Code</productName>
-    <companyName></companyName>
-    <internalName>MonocraftFontTool</internalName>
-    <originalFilename>Monocraft Font Tool for VSC.exe</originalFilename>
-    <trademarks></trademarks>
-    <language>ENGLISH_US</language>
-  </versionInfo>
-  <jre>
-    <path></path>
-    <bundledJre64Bit>false</bundledJre64Bit>
-    <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>11</minVersion>
-    <maxVersion></maxVersion>
-    <jdkPreference>preferJre</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
-  </jre>
-</launch4jConfig>
-"@
-# Save as UTF8 without BOM which Launch4j prefers
-$launch4jXml | Out-File -FilePath $launch4jConfig -Encoding utf8
-Write-Host "Launch4j config generated with version $exeVersion"
+# 3. Call package.ps1 to create native package with jpackage
+Write-Host "`n==> Creating native package with jpackage..."
+$packageScript = Join-Path $scriptDir 'package.ps1'
+& $packageScript -Type $PackageType
 
-
-# 4. Run Launch4j using absolute path
-Write-Host 'Packaging EXE with Launch4j...'
-Write-Host 'Packaging EXE with Launch4j...'
-
-# small pause to ensure file handles are released
-Start-Sleep -Milliseconds 300
-
-# Run Launch4j and capture output
-$launch4jExe = 'C:\Program Files (x86)\Launch4j\launch4j.exe'
-$logFile = Join-Path $buildDir 'launch4j.log'
-& $launch4jExe $launch4jConfig *>&1 | Tee-Object -FilePath $logFile
 if ($LASTEXITCODE -ne 0) {
-  Write-Error "Launch4j packaging failed. See $logFile for details."
-  Get-Content $logFile | Write-Host
-  exit 1
+    Write-Error 'Package creation failed.'
+    exit 1
 }
 
-Write-Host 'Build complete! You can now distribute' $exeName
+Write-Host "`n================================================" -ForegroundColor Green
+Write-Host " Build Complete!" -ForegroundColor Green
+Write-Host "================================================" -ForegroundColor Green
+Write-Host "`nOutput: build\package\MonocraftFontTool\" -ForegroundColor Cyan
+Write-Host ""
+
