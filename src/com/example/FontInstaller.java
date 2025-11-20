@@ -44,14 +44,35 @@ public class FontInstaller {
             if (n.endsWith(".ttf")) ttf = p;
         }
 
-        // Fallback to external folder if not bundled
+        // Fallback to external folder if not bundled in JAR
         if (ttc == null || ttf == null) {
-            String projectDir = Paths.get("").toAbsolutePath().toString();
-            Path srcDir = Paths.get(projectDir, "resources", "fonts", "Monocraft-font");
-            Path altTtc = srcDir.resolve("Monocraft-nerd-fonts-patched.ttc");
-            Path altTtf = srcDir.resolve("Monocraft-ttf-otf").resolve("other-formats").resolve("Monocraft.ttf");
-            if (Files.exists(altTtc)) ttc = altTtc;
-            if (Files.exists(altTtf)) ttf = altTtf;
+            // Try app directory (for jpackage builds)
+            String appDir = System.getProperty("app.dir");
+            if (appDir == null || appDir.isEmpty()) {
+                // Fallback: get directory of the running application
+                try {
+                    appDir = new java.io.File(FontInstaller.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+                } catch (Exception e) {
+                    appDir = Paths.get("").toAbsolutePath().toString();
+                }
+            }
+            
+            // Try resources folder next to app
+            Path appResourceDir = Paths.get(appDir, "resources", "fonts", "Monocraft-font");
+            Path appTtc = appResourceDir.resolve("Monocraft-nerd-fonts-patched.ttc");
+            Path appTtf = appResourceDir.resolve("Monocraft-ttf-otf").resolve("other-formats").resolve("Monocraft.ttf");
+            if (ttc == null && Files.exists(appTtc)) ttc = appTtc;
+            if (ttf == null && Files.exists(appTtf)) ttf = appTtf;
+            
+            // Try current directory resources (for development builds)
+            if (ttc == null || ttf == null) {
+                String projectDir = Paths.get("").toAbsolutePath().toString();
+                Path srcDir = Paths.get(projectDir, "resources", "fonts", "Monocraft-font");
+                Path altTtc = srcDir.resolve("Monocraft-nerd-fonts-patched.ttc");
+                Path altTtf = srcDir.resolve("Monocraft-ttf-otf").resolve("other-formats").resolve("Monocraft.ttf");
+                if (ttc == null && Files.exists(altTtc)) ttc = altTtc;
+                if (ttf == null && Files.exists(altTtf)) ttf = altTtf;
+            }
         }
 
         if ((ttc == null || !Files.exists(ttc)) && (ttf == null || !Files.exists(ttf))) {

@@ -14,7 +14,7 @@ import java.util.Locale;
  * - Add/remove Monocraft font configuration in VS Code settings
  * - Bundled fonts support for single-file distribution
  * 
- * @version 1.3.0
+ * @version 1.3.4
  */
 public class MonocraftFontInstaller {
     

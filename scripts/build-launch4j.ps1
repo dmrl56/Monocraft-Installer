@@ -61,7 +61,7 @@ if ($LASTEXITCODE -ne 0) { Write-Error 'JAR creation failed.'; exit 1 }
 $iconPath = Join-Path $projectRoot 'app-icon.ico'
 $iconXml = if (Test-Path $iconPath) { "<icon>$iconPath</icon>" } else { "<icon></icon>" }
 
-$exeVersion = '1.3.3.0'
+$exeVersion = '1.3.4.0'
 $launch4jXml = @"
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>

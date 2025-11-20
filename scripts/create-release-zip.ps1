@@ -7,7 +7,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Split-Path -Parent $scriptDir
 $packageDir = Join-Path $projectRoot 'build\package\MonocraftFontTool'
 $outputDir = Join-Path $projectRoot 'build'
-$zipName = 'MonocraftFontTool-v1.3.3-Windows.zip'
+$zipName = 'MonocraftFontTool-v1.3.4-Windows.zip'
 $zipPath = Join-Path $outputDir $zipName
 
 Write-Host "`n================================================" -ForegroundColor Cyan
@@ -45,9 +45,9 @@ Write-Host "`n================================================" -ForegroundColor
 Write-Host " Ready for GitHub Release!" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Green
 
-Write-Host "`nNext steps:" -ForegroundColor Cyan
+Write-Host "\nNext steps:" -ForegroundColor Cyan
 Write-Host "  1. Go to: https://github.com/dmrl56/vsc-mc-script/releases/new" -ForegroundColor White
-  Write-Host "  2. Create a new tag (e.g., v1.3.3)" -ForegroundColor White
+  Write-Host "  2. Create a new tag (e.g., v1.3.4)" -ForegroundColor White
 Write-Host "  3. Upload: $zipName" -ForegroundColor Yellow
 Write-Host "  4. Users download, extract, and run MonocraftFontTool.exe" -ForegroundColor White
 Write-Host "`n  Note: Users do NOT need Java installed!" -ForegroundColor Green
