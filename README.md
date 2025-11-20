@@ -204,7 +204,7 @@ Sign the EXE/installer with a code-signing certificate (optional, for trusted di
 
 ### Version Information
 The EXE includes proper Windows version metadata:
-- **Version**: 1.3.3.0
+- **Version**: 1.3.5.0
 - **Product Name**: Monocraft Font Tool for VS Code
 - **Description**: Monocraft Font Configuration Tool for Visual Studio Code
 

@@ -84,11 +84,11 @@ $launch4jXml = @"
   </singleInstance>
   <versionInfo>
     <fileVersion>$exeVersion</fileVersion>
-  <txtFileVersion>1.3.3</txtFileVersion>
+  <txtFileVersion>1.3.5</txtFileVersion>
     <fileDescription>Monocraft Font Configuration Tool for Visual Studio Code</fileDescription>
     <copyright>Copyright © 2025</copyright>
     <productVersion>$exeVersion</productVersion>
-  <txtProductVersion>1.3.3</txtProductVersion>
+  <txtProductVersion>1.3.5</txtProductVersion>
     <productName>Monocraft Font Tool for VS Code</productName>
     <companyName></companyName>
     <internalName>MonocraftFontTool</internalName>

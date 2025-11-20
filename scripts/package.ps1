@@ -186,7 +186,7 @@ $jpackageArgs = @(
     '--main-class', 'com.example.MonocraftFontInstaller',
     '--type', $Type,
     '--dest', $packageDir,
-    '--app-version', '1.3.4',
+    '--app-version', '1.3.5',
     '--description', 'Monocraft Font Configuration Tool for Visual Studio Code',
     '--vendor', 'Monocraft Font Tool',
     '--copyright', 'Copyright 2025',

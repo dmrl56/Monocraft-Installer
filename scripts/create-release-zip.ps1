@@ -47,7 +47,7 @@ Write-Host "================================================" -ForegroundColor G
 
 Write-Host "\nNext steps:" -ForegroundColor Cyan
 Write-Host "  1. Go to: https://github.com/dmrl56/vsc-mc-script/releases/new" -ForegroundColor White
-  Write-Host "  2. Create a new tag (e.g., v1.3.4)" -ForegroundColor White
+  Write-Host "  2. Create a new tag (e.g., v1.3.5)" -ForegroundColor White
 Write-Host "  3. Upload: $zipName" -ForegroundColor Yellow
 Write-Host "  4. Users download, extract, and run MonocraftFontTool.exe" -ForegroundColor White
 Write-Host "`n  Note: Users do NOT need Java installed!" -ForegroundColor Green
