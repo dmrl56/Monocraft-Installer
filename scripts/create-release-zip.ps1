@@ -7,7 +7,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Split-Path -Parent $scriptDir
 $packageDir = Join-Path $projectRoot 'build\package\MonocraftFontTool'
 $outputDir = Join-Path $projectRoot 'build'
-$zipName = 'MonocraftFontTool-v1.3.4-Windows.zip'
+$zipName = 'MonocraftFontTool-v1.3.5-Windows.zip'
 $zipPath = Join-Path $outputDir $zipName
 
 Write-Host "`n================================================" -ForegroundColor Cyan

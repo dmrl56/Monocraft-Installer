@@ -35,7 +35,7 @@ vsc-mc-script/
   ```powershell
   .\scripts\rebuild.ps1
   ```
-  Output: `build\package\MonocraftFontTool-1.3.4.exe` single-file installer (50 MB, no Java required on target)
+  Output: `build\package\MonocraftFontTool-1.3.5.exe` single-file installer (50 MB, no Java required on target)
 
 - **Alternative Package Types:**
   ```powershell

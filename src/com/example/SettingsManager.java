@@ -123,7 +123,9 @@ public class SettingsManager {
             }
         }
 
-        lines.add(insertIndex, newProperty);
+        // If not the last property, add a comma
+        boolean needsComma = insertIndex < lines.size() - 1;
+        lines.add(insertIndex, newProperty + (needsComma ? "," : ""));
         return String.join("\n", lines);
     }
 

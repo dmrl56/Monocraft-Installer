@@ -37,7 +37,7 @@
 
 ### For Users
 
-1. **Download** the latest installer: [`MonocraftFontTool-1.3.4.exe`](https://github.com/dmrl56/Monocraft-Installer/releases)
+1. **Download** the latest installer: [`MonocraftFontTool-1.3.5.exe`](https://github.com/dmrl56/Monocraft-Installer/releases)
 2. **Run** the installer and follow the setup wizard
 3. **Complete installation** 
 4. Click **Install Fonts** to install the Monocraft fonts
@@ -69,7 +69,7 @@ cd vsc-mc-script
 # Build the installer (default: single-file .exe installer)
 .\scripts\rebuild.ps1
 
-# Output: build\package\MonocraftFontTool-1.3.4.exe (50 MB)
+# Output: build\package\MonocraftFontTool-1.3.5.exe (50 MB)
 # Upload this single file to GitHub releases
 ```
 

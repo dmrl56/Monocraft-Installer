@@ -56,9 +56,7 @@ public class FontInstaller {
                     appDir = Paths.get("").toAbsolutePath().toString();
                 }
             }
-            
-            // Try resources folder next to app
-            Path appResourceDir = Paths.get(appDir, "resources", "fonts", "Monocraft-font");
+            Path appResourceDir = Paths.get(appDir);
             Path appTtc = appResourceDir.resolve("Monocraft-nerd-fonts-patched.ttc");
             Path appTtf = appResourceDir.resolve("Monocraft-ttf-otf").resolve("other-formats").resolve("Monocraft.ttf");
             if (ttc == null && Files.exists(appTtc)) ttc = appTtc;
@@ -82,7 +80,8 @@ public class FontInstaller {
         // Get user fonts directory
         String localAppData = System.getenv("LOCALAPPDATA");
         if (localAppData == null || localAppData.isEmpty()) {
-            localAppData = System.getProperty("user.home") + "\\AppData\\Local";
+            // Use relative path from user.home if LOCALAPPDATA is not set
+            localAppData = Paths.get(System.getProperty("user.home"), "AppData", "Local").toString();
         }
         Path fontsDest = Paths.get(localAppData, "Microsoft", "Windows", "Fonts");
         if (!Files.exists(fontsDest)) {
@@ -90,11 +89,12 @@ public class FontInstaller {
         }
 
         // Install TTC font
+        String regPath = String.join("\\", "HKCU", "Software", "Microsoft", "Windows NT", "CurrentVersion", "Fonts");
         if (ttc != null && Files.exists(ttc)) {
             Path destTtc = fontsDest.resolve(ttc.getFileName());
             FileUtils.copyFile(ttc, destTtc);
             SystemUtils.runCommand(new String[]{
-                "reg", "add", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", 
+                "reg", "add", regPath, 
                 "/v", FONT_NERD_NAME, "/t", "REG_SZ", "/d", destTtc.getFileName().toString(), "/f"
             }, true);
         }
@@ -104,7 +104,7 @@ public class FontInstaller {
             Path destTtf = fontsDest.resolve(ttf.getFileName());
             FileUtils.copyFile(ttf, destTtf);
             SystemUtils.runCommand(new String[]{
-                "reg", "add", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", 
+                "reg", "add", regPath,
                 "/v", FONT_REGULAR_NAME, "/t", "REG_SZ", "/d", destTtf.getFileName().toString(), "/f"
             }, true);
         }
@@ -119,7 +119,7 @@ public class FontInstaller {
                     "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(null, 
-                    "Fonts installed successfully for the current user.\n\nUse 'Add Monocraft Font' button to configure VS Code.", 
+                    "Fonts installed successfully!", 
                     "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
@@ -148,12 +148,13 @@ public class FontInstaller {
         if (Files.exists(ttf)) Files.delete(ttf);
 
         // Remove registry entries
+        String regPath = String.join("\\", "HKCU", "Software", "Microsoft", "Windows NT", "CurrentVersion", "Fonts");
         SystemUtils.runCommand(new String[]{
-            "reg", "delete", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", 
+            "reg", "delete", regPath,
             "/v", FONT_NERD_NAME, "/f"
         }, true);
         SystemUtils.runCommand(new String[]{
-            "reg", "delete", "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", 
+            "reg", "delete", regPath,
             "/v", FONT_REGULAR_NAME, "/f"
         }, true);
 

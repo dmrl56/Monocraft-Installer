@@ -219,7 +219,7 @@ if ($Type -eq 'exe' -or $Type -eq 'msi') {
         $launchBat = Join-Path $postInstallDir 'launch.bat'
         @"
 @echo off
-start "" "%ProgramFiles%\MonocraftFontTool\MonocraftFontTool.exe"
+start "" "MonocraftFontTool.exe"
 "@ | Out-File -FilePath $launchBat -Encoding ASCII
         
         Write-Host "Created post-install launch script" -ForegroundColor Gray
