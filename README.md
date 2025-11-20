@@ -39,7 +39,7 @@
 
 1. **Download** the latest installer: [`MonocraftFontTool-1.3.3.exe`](https://github.com/dmrl56/Monocraft-Installer/releases)
 2. **Run** the installer and follow the setup wizard
-3. **Complete installation** - The application will launch automatically when you click "Finish"
+3. **Complete installation** 
 4. Click **Install Fonts** to install the Monocraft fonts
 5. Click **Add Monocraft Font** to configure VS Code
 6. Restart VS Code to see the changes
@@ -185,7 +185,6 @@ Sign the EXE/installer with a code-signing certificate (optional, for trusted di
 - Single-file installer (42 MB)
 - **No Java required** on user's computer - everything is bundled
 - Professional installer with Start Menu shortcuts and uninstaller
-- **Auto-launch** - Application starts automatically after installation
 - Directory chooser - Users can select installation location
 - Best for general distribution to end users
 - Upload single file to GitHub releases
