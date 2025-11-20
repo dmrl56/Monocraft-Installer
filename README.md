@@ -37,7 +37,7 @@
 
 ### For Users
 
-1. **Download** the latest executable: `Monocraft Font Tool for VSC.exe`
+1. **Download** the latest executable: [`Monocraft Font Tool for VSC.exe`](https://github.com/dmrl56/Monocraft-Installer/releases)
 2. **Run** the application (no installation needed)
 3. Click **Install Fonts** to install the Monocraft fonts
 4. Click **Add Monocraft Font** to configure VS Code
