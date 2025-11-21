@@ -77,36 +77,32 @@ public class FontInstaller {
             throw new IOException("Font files not found. Include Monocraft-font folder or bundle fonts into the jar.");
         }
 
-        // Get user fonts directory
-        String localAppData = System.getenv("LOCALAPPDATA");
-        if (localAppData == null || localAppData.isEmpty()) {
-            // Use relative path from user.home if LOCALAPPDATA is not set
-            localAppData = Paths.get(System.getProperty("user.home"), "AppData", "Local").toString();
-        }
-        Path fontsDest = Paths.get(localAppData, "Microsoft", "Windows", "Fonts");
-        if (!Files.exists(fontsDest)) {
-            Files.createDirectories(fontsDest);
-        }
+        // Install fonts using PowerShell and Shell.Application COM object
+        // This is the proper way to install fonts on Windows
+        List<Path> fontsToInstall = new ArrayList<>();
+        if (ttc != null && Files.exists(ttc)) fontsToInstall.add(ttc);
+        if (ttf != null && Files.exists(ttf)) fontsToInstall.add(ttf);
 
-        // Install TTC font
-        String regPath = String.join("\\", "HKCU", "Software", "Microsoft", "Windows NT", "CurrentVersion", "Fonts");
-        if (ttc != null && Files.exists(ttc)) {
-            Path destTtc = fontsDest.resolve(ttc.getFileName());
-            FileUtils.copyFile(ttc, destTtc);
+        for (Path fontFile : fontsToInstall) {
+            // Use PowerShell to install font via Shell.Application COM object
+            String psScript = String.format(
+                "$fontPath = '%s'; " +
+                "$shell = New-Object -ComObject Shell.Application; " +
+                "$fontsFolder = $shell.Namespace(0x14); " +
+                "$fontsFolder.CopyHere($fontPath, 0x10);",
+                fontFile.toString().replace("'", "''")
+            );
+            
             SystemUtils.runCommand(new String[]{
-                "reg", "add", regPath, 
-                "/v", FONT_NERD_NAME, "/t", "REG_SZ", "/d", destTtc.getFileName().toString(), "/f"
+                "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", psScript
             }, true);
         }
 
-        // Install TTF font
-        if (ttf != null && Files.exists(ttf)) {
-            Path destTtf = fontsDest.resolve(ttf.getFileName());
-            FileUtils.copyFile(ttf, destTtf);
-            SystemUtils.runCommand(new String[]{
-                "reg", "add", regPath,
-                "/v", FONT_REGULAR_NAME, "/t", "REG_SZ", "/d", destTtf.getFileName().toString(), "/f"
-            }, true);
+        // Wait a moment for Windows to register the fonts
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         // Verify installation
@@ -124,7 +120,7 @@ public class FontInstaller {
             }
         } else {
             JOptionPane.showMessageDialog(null, 
-                "Fonts copied but verification failed. You may need to sign out/in.", 
+                "Fonts copied but verification failed. You may need to restart applications or sign out/in.", 
                 "Partial Success", JOptionPane.WARNING_MESSAGE);
         }
     }
