@@ -76,8 +76,8 @@ public class SettingsManager {
      * Adds or updates a property in the JSON settings.
      */
     private static String addOrUpdateProperty(String json, String key, String value) {
-        // Operate on lines to preserve user formatting
-        String[] rawLines = json.split("\n", -1);
+        // Operate on lines to preserve user formatting - handle both \r\n and \n
+        String[] rawLines = json.split("\\r?\\n", -1);
         List<String> lines = new ArrayList<>();
         for (String l : rawLines) lines.add(l);
 
@@ -98,6 +98,26 @@ public class SettingsManager {
             }
         }
 
+        // Clean up standalone comma lines and merge them with previous lines FIRST
+        for (int i = lines.size() - 1; i >= 0; i--) {
+            String trimmed = lines.get(i).trim();
+            if (trimmed.equals(",") || trimmed.isEmpty()) {
+                if (trimmed.equals(",")) {
+                    // Move comma to previous non-empty line
+                    int prevNonEmpty = i - 1;
+                    while (prevNonEmpty >= 0 && lines.get(prevNonEmpty).trim().isEmpty()) prevNonEmpty--;
+                    
+                    if (prevNonEmpty >= 0 && !lines.get(prevNonEmpty).trim().endsWith(",") && !lines.get(prevNonEmpty).trim().equals("{")) {
+                        lines.set(prevNonEmpty, lines.get(prevNonEmpty) + ",");
+                    }
+                }
+                // Remove empty and standalone comma lines
+                if (trimmed.equals(",") || (trimmed.isEmpty() && i > 0 && i < lines.size() - 1)) {
+                    lines.remove(i);
+                }
+            }
+        }
+
         // Insert before the last closing brace
         int insertIndex = -1;
         for (int i = lines.size() - 1; i >= 0; i--) {
@@ -115,6 +135,7 @@ public class SettingsManager {
         // Ensure previous line ends with comma
         int prev = insertIndex - 1;
         while (prev >= 0 && lines.get(prev).trim().isEmpty()) prev--;
+        
         if (prev >= 0) {
             String prevLine = lines.get(prev);
             String t = prevLine.trim();
@@ -123,9 +144,8 @@ public class SettingsManager {
             }
         }
 
-        // If not the last property, add a comma
-        boolean needsComma = insertIndex < lines.size() - 1;
-        lines.add(insertIndex, newProperty + (needsComma ? "," : ""));
+        // New property is inserted before closing brace, so it's the last property (no comma needed)
+        lines.add(insertIndex, newProperty);
         return String.join("\n", lines);
     }
 
@@ -150,6 +170,17 @@ public class SettingsManager {
 
         if (!removed) return json;
 
+        // Remove standalone comma lines and dangling commas before closing brace
+        for (int i = 0; i < lines.size(); ) {
+            String trimmed = lines.get(i).trim();
+            // Remove standalone comma lines
+            if (trimmed.equals(",")) {
+                lines.remove(i);
+                continue;
+            }
+            i++;
+        }
+        
         // Remove dangling comma before closing brace
         for (int i = 0; i < lines.size(); i++) {
             if (lines.get(i).trim().equals("}")) {
